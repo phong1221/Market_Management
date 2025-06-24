@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 21, 2025 lúc 03:39 AM
+-- Thời gian đã tạo: Th6 23, 2025 lúc 04:46 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -44,7 +44,8 @@ INSERT INTO `employee` (`idEmployee`, `nameEmployee`, `genderEmployee`, `address
 (1, 'Trần Thị Nhung', 'Female', 'Bình Dương', 1234345356, 'Cashier'),
 (2, 'Nguyễn Quang Thắng', 'Male', 'Đà Nẵng', 1234564567, 'Accountant'),
 (3, 'Đặng Thị Mầu', 'Other', 'Khánh Yên', 932452345, 'Accountant'),
-(4, 'Con Kiến Huy', 'Other', 'Phú Yên', 1231322345, 'Stocker');
+(4, 'Con Kiến Huy', 'Other', 'Phú Yên', 1231322345, 'Stocker'),
+(15, 'Phong', 'Male', 'ss', 0, 'Cashier');
 
 -- --------------------------------------------------------
 
@@ -246,7 +247,8 @@ INSERT INTO `salary` (`idSalary`, `idEmployee`, `basicSalary`, `bonus`, `totalSa
 (1, 1, 10000000, 2000000, 12000000, 0, '2025-06-07'),
 (2, 2, 12000000, 2000000, 14000000, 0, '2025-06-16'),
 (3, 3, 15000000, 3000000, 18000000, 0, '2025-06-30'),
-(4, 4, 13000000, 2000000, 15000000, 0, '2025-06-03');
+(4, 4, 13000000, 2000000, 15000000, 0, '2025-06-01'),
+(6, 15, 11111111, 12, 11109911, 1212, '2025-08-01');
 
 -- --------------------------------------------------------
 
@@ -258,18 +260,19 @@ CREATE TABLE `typeproduct` (
   `idType` int(11) NOT NULL,
   `nameType` varchar(255) NOT NULL,
   `descriptionType` varchar(255) NOT NULL,
-  `inventory` int(11) NOT NULL
+  `inventory` int(11) NOT NULL,
+  `typeSell` enum('Số lượng','Khối lượng') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `typeproduct`
 --
 
-INSERT INTO `typeproduct` (`idType`, `nameType`, `descriptionType`, `inventory`) VALUES
-(1, 'Thức Ăn', 'Bao gồm thức ăn dinh dưỡng và thức ăn nhanh', 100),
-(2, 'Đồ gia dụng', 'Bao gồm các vật dụng cần thiết cho mọi nhà.', 100),
-(3, 'Hoa quả', 'Bao gồm các trái cây tươi.', 100),
-(4, 'Quà Tặng', 'Bao gồm các món quà xinh đẹp có thể tặng người đặc biệt vào những dịp đặc biệt.', 100);
+INSERT INTO `typeproduct` (`idType`, `nameType`, `descriptionType`, `inventory`, `typeSell`) VALUES
+(1, 'Thức Ăn', 'Bao gồm thức ăn dinh dưỡng và thức ăn nhanh', 1005, 'Số lượng'),
+(2, 'Đồ gia dụng', 'Bao gồm các vật dụng cần thiết cho mọi nhà.', 100, 'Số lượng'),
+(3, 'Hoa quả', 'Bao gồm các trái cây tươi.', 100, 'Số lượng'),
+(4, 'Quà Tặng', 'Bao gồm các món quà xinh đẹp có thể tặng người đặc biệt vào những dịp đặc biệt.', 100, 'Số lượng');
 
 -- --------------------------------------------------------
 
@@ -390,7 +393,7 @@ ALTER TABLE `useraccount`
 -- AUTO_INCREMENT cho bảng `employee`
 --
 ALTER TABLE `employee`
-  MODIFY `idEmployee` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `idEmployee` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT cho bảng `importproduct`
@@ -420,7 +423,7 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT cho bảng `promotion`
 --
 ALTER TABLE `promotion`
-  MODIFY `idPromotion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idPromotion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `provider`
@@ -432,13 +435,13 @@ ALTER TABLE `provider`
 -- AUTO_INCREMENT cho bảng `salary`
 --
 ALTER TABLE `salary`
-  MODIFY `idSalary` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idSalary` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT cho bảng `typeproduct`
 --
 ALTER TABLE `typeproduct`
-  MODIFY `idType` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `idType` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT cho bảng `useraccount`
