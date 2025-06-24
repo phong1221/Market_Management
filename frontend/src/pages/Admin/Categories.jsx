@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fetchTypeProducts, addTypeProduct, updateTypeProduct, deleteTypeProduct } from '../../services/typeProductService'
+import { fetchTypeProduct, addTypeProduct, updateTypeProduct, deleteTypeProduct } from '../../services/typeProductService'
 import '../../css/notification.css'
 import TypeProduct from '../../models/typeProduct'
 
@@ -30,7 +30,7 @@ const Categories = () => {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const data = await fetchTypeProducts()
+      const data = await fetchTypeProduct()
       setTypeProducts(data)
     } catch (error) {
       setNotification({ message: 'Lỗi khi tải danh mục: ' + error.message, type: 'error' })
@@ -260,7 +260,8 @@ const Categories = () => {
                   className="form-input"
                   value={formData.inventory}
                   onChange={handleInputChange}
-                  required
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
                 />
               </div>
               <div className="form-group">
