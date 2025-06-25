@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
@@ -15,13 +15,15 @@ import Categories from './pages/Admin/Categories.jsx'
 import Promotions from './pages/Admin/Promotions.jsx'
 import Imports from './pages/Admin/Imports.jsx'
 import Salary from './pages/Admin/Salary.jsx'
+import Brands from './pages/Admin/Brands.jsx'
 import Login from './pages/Admin/Login.jsx'
 // import AccountInfo from './pages/Admin/AccountInfo.jsx' 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   return (
     <Router>
       <div className="App">
-        <Header />
+        <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -33,6 +35,7 @@ function App() {
             <Route path="/promotions" element={<Promotions />} />
             <Route path="/imports" element={<Imports />} />
             <Route path="/salary" element={<Salary />} />
+            <Route path="/brands" element={<Brands />} />
             <Route path="/login" element={<Login />} />
             {/* <Route path="/account-info" element={<AccountInfo />} /> */}
           </Routes>

@@ -379,14 +379,15 @@ const Providers = () => {
                 <td>{provider.emailProvider}</td>
                 <td>
                   <button 
-                    className="btn btn-warning btn-sm"
-                    style={{ marginRight: 8 }}
+                    className="btn btn-primary btn-sm action-anim"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
                     onClick={() => handleEdit(provider)}
                   >
                     Sửa
                   </button>
                   <button 
-                    className="btn btn-danger btn-sm"
+                    className="btn btn-secondary btn-sm action-anim"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(provider.idProvider)}
                   >
                     Xóa

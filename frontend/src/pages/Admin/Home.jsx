@@ -21,6 +21,13 @@ const Home = () => {
       path: '/products',
       icon: '📦'
     },
+    
+    {
+      title: 'Danh mục sản phẩm',
+      description: 'Phân loại và quản lý danh mục',
+      path: '/categories',
+      icon: '📋'
+    },
     {
       title: 'Nhà cung cấp',
       description: 'Quản lý thông tin nhà cung cấp',
@@ -28,10 +35,16 @@ const Home = () => {
       icon: '🏢'
     },
     {
-      title: 'Danh mục sản phẩm',
-      description: 'Phân loại và quản lý danh mục',
-      path: '/categories',
-      icon: '📋'
+      title:'Danh mục sản phẩm',
+      description:'Phân loại và quản lý danh mục',
+      path:'/categories',
+      icon:'🏚️'
+    },
+    {
+      title: 'Quản lý thương hiệu',
+      description: 'Quản lý thương hiệu sản phẩm',
+      path: '/brands',
+      icon: '📩'
     },
     {
       title: 'Khuyến mãi',

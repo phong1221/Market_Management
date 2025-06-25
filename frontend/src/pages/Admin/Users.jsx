@@ -493,21 +493,22 @@ const Users = () => {
                 <td>{user.roleUser}</td>
                 <td>
                   <button 
-                    className="btn btn-info btn-sm"
+                    className="btn btn-info btn-sm action-anim"
+                    style={{ minWidth: 60, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleViewDetail(user)}
-                    style={{ marginRight: '5px' }}
                   >
                     Chi tiết
                   </button>
                   <button 
-                    className="btn btn-warning btn-sm"
+                    className="btn btn-primary btn-sm action-anim"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleEditClick(user)}
-                    style={{ marginRight: '5px' }}
                   >
                     Sửa
                   </button>
                   <button 
-                    className="btn btn-danger btn-sm"
+                    className="btn btn-secondary btn-sm action-anim"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(user.idUser)}
                   >
                     Xóa

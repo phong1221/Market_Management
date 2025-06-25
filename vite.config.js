@@ -6,7 +6,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      // Proxy tất cả các API qua /api -> http://localhost:8000/
+      '/products': 'http://localhost:8000',
+      '/providers': 'http://localhost:8000',
+      '/categories': 'http://localhost:8000',
+      '/imports': 'http://localhost:8000',
+      // Giữ cả /api nếu bạn có một số API dùng dạng đó
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
@@ -16,13 +20,13 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist',         // thư mục đầu ra
-    assetsDir: 'assets',    // thư mục chứa static (ảnh, js, css)
-    sourcemap: true         // tạo file map để debug dễ hơn
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true
   },
   resolve: {
     alias: {
-      '@': '/src'           // cho phép import từ '@/components/...'
+      '@': '/src'
     }
   }
 })

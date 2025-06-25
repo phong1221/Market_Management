@@ -309,10 +309,10 @@ const Categories = () => {
                 <td>{category.inventory}</td>
                 <td>{category.typeSell}</td>
                 <td>
-                  <button className="btn btn-warning btn-sm" style={{ marginRight: 8 }} onClick={() => handleEdit(category)}>
+                  <button className="btn btn-primary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }} onClick={() => handleEdit(category)}>
                     Sửa
                   </button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(category.idType)}>
+                  <button className="btn btn-secondary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }} onClick={() => handleDelete(category.idType)}>
                     Xóa
                   </button>
                 </td>

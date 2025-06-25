@@ -3,6 +3,7 @@ import { fetchProduct, addProduct, updateProduct, deleteProduct } from '../../se
 import { fetchProvider } from '../../services/providerService'
 import { fetchPromotion } from '../../services/promotionService'
 import { fetchTypeProduct } from '../../services/typeProductService'
+import { fetchBrand } from '../../services/brandService'
 import '../../css/notification.css';
 import '../../css/product.css';
 
@@ -71,37 +72,21 @@ const Products = () => {
   }
 
   const fetchData = async () => {
+    setLoading(true)
     try {
-      setLoading(true)
-      // Fetch products using our service
-      const productsData = await fetchProduct()
-      setProducts(productsData)
-      console.log('Products loaded:', productsData)
-      
-      // Fetch real providers
-      const providersData = await fetchProvider()
-      setProviders(providersData)
-      console.log('Providers loaded:', providersData)
-      
-      // Fetch real categories (typeProduct)
-      const categoriesData = await fetchTypeProduct()
-      setCategories(categoriesData)
-      console.log('Categories loaded:', categoriesData)
-      
-      // Fetch real promotions
-      const promotionsData = await fetchPromotion()
-      setPromotions(promotionsData)
-      console.log('Promotions loaded:', promotionsData)
-      
-      // TODO: Add brand service when it's created
-      // const brandsData = await fetchBrand()
-      
-      // For now, using mock data for brands
-      setBrands([
-        { idBrand: 1, nameBrand: 'Brand A' },
-        { idBrand: 2, nameBrand: 'Brand B' },
-        { idBrand: 3, nameBrand: 'Brand C' }
+      const [productsData, providersData, categoriesData, promotionsData, brandsData] = await Promise.all([
+        fetch('http://localhost/market_management/backend/api/product/getProduct.php').then(res => res.json()),
+        fetch('http://localhost/market_management/backend/api/provider/getProvider.php').then(res => res.json()),
+        fetch('http://localhost/market_management/backend/api/typeProduct/getTypeProduct.php').then(res => res.json()),
+        fetch('http://localhost/market_management/backend/api/promotion/getPromotion.php').then(res => res.json()),
+        fetchBrand()
       ])
+      
+      setProducts(productsData.data || [])
+      setProviders(providersData.data || [])
+      setCategories(categoriesData.data || [])
+      setPromotions(promotionsData.data || [])
+      setBrands(brandsData || [])
       
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -263,10 +248,10 @@ const Products = () => {
       <div className="page-header">
         <h1 className="page-title">Quản lý sản phẩm</h1>
         <button 
-          className="btn btn-primary" 
+          className="btn btn-primary btn-sm" 
           onClick={() => setShowForm(true)}
         >
-          Thêm sản phẩm mới
+          Thêm sản phẩm
         </button>
       </div>
 
@@ -488,12 +473,14 @@ const Products = () => {
                 <td className="action-buttons">
                   <button 
                     className="btn btn-primary btn-sm"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleEdit(product)}
                   >
                     Sửa
                   </button>
                   <button 
                     className="btn btn-secondary btn-sm"
+                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(product.idProduct)}
                   >
                     Xóa
