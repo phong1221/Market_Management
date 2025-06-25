@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fetchTypeProducts, addTypeProduct, updateTypeProduct, deleteTypeProduct } from '../../services/typeProductService'
+import { fetchTypeProduct, addTypeProduct, updateTypeProduct, deleteTypeProduct } from '../../services/typeProductService'
 import '../../css/notification.css'
 import TypeProduct from '../../models/typeProduct'
 
@@ -30,7 +30,7 @@ const Categories = () => {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const data = await fetchTypeProducts()
+      const data = await fetchTypeProduct()
       setTypeProducts(data)
     } catch (error) {
       setNotification({ message: 'Lỗi khi tải danh mục: ' + error.message, type: 'error' })
@@ -260,7 +260,8 @@ const Categories = () => {
                   className="form-input"
                   value={formData.inventory}
                   onChange={handleInputChange}
-                  required
+                  readOnly
+                  style={{ backgroundColor: '#f5f5f5' }}
                 />
               </div>
               <div className="form-group">
@@ -308,10 +309,10 @@ const Categories = () => {
                 <td>{category.inventory}</td>
                 <td>{category.typeSell}</td>
                 <td>
-                  <button className="btn btn-warning btn-sm" style={{ marginRight: 8 }} onClick={() => handleEdit(category)}>
+                  <button className="btn btn-primary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }} onClick={() => handleEdit(category)}>
                     Sửa
                   </button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(category.idType)}>
+                  <button className="btn btn-secondary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }} onClick={() => handleDelete(category.idType)}>
                     Xóa
                   </button>
                 </td>

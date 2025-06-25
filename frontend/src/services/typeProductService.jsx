@@ -5,23 +5,20 @@ const API_URL_ADD = "http://localhost/market_management/backend/api/typeProduct/
 const API_URL_DELETE = "http://localhost/market_management/backend/api/typeProduct/deleteTypeProduct.php";
 const API_URL_UPDATE = "http://localhost/market_management/backend/api/typeProduct/updateTypeProduct.php";
 
-export async function fetchTypeProducts() {
+export async function fetchTypeProduct() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        if (data.success && Array.isArray(data.data)) {
-            return data.data.map(item => new TypeProduct(
-                item.idType,
-                item.nameType,
-                item.descriptionType,
-                item.inventory,
-                item.typeSell
-            ));
+        console.log("TypeProduct API response:", data);
+        
+        if (data.success) {
+            return data.data || [];
+        } else {
+            console.error("Error fetching type products:", data.message);
+            return [];
         }
-        console.error("API response format is not as expected:", data);
-        return [];
     } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+        console.error("Lỗi khi gọi API typeProduct:", error);
         return [];
     }
 }

@@ -1,8 +1,9 @@
 <?php
 // Set CORS headers
-header("Access-control-allow-origin: http://localhost:3000");
-header("access-control-allow-methods: get, post, put, delete, options");
-header("access-control-allow-headers: content-type, authorization");
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST, PUT, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit;
