@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 24, 2025 lúc 03:52 AM
+-- Thời gian đã tạo: Th6 26, 2025 lúc 06:48 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -33,6 +33,21 @@ CREATE TABLE `brand` (
   `logoBrand` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Đang đổ dữ liệu cho bảng `brand`
+--
+
+INSERT INTO `brand` (`idBrand`, `nameBrand`, `logoBrand`) VALUES
+(1, 'Nike', 'logo_Nike.jpg'),
+(2, 'Adidas', 'logo_Adidas.png'),
+(3, 'Apple', 'logo_Apple.jpg'),
+(4, 'Samsung', 'logo_SamSung.png'),
+(5, 'Coca-Cola', 'logo_Coca-cola.png'),
+(6, 'Pepsi', 'logo_Pepse.png'),
+(7, 'McDonald\'s', '1750815223_Logo_MC.png.crdownload'),
+(8, 'KFC', 'logo_KFC.png'),
+(9, 'Toyota', '1750815240_logo_toyota.jpg.crdownload');
+
 -- --------------------------------------------------------
 
 --
@@ -53,60 +68,57 @@ CREATE TABLE `employee` (
 --
 
 INSERT INTO `employee` (`idEmployee`, `nameEmployee`, `genderEmployee`, `addressEmployee`, `phoneEmployee`, `roleEmployee`) VALUES
-(1, 'Trần Thị Nhung', 'Female', 'Bình Dương', 1234345356, 'Cashier'),
+(1, 'Trần Thị Nhungg', 'Female', 'Bình Dương', 1234345356, 'Cashier'),
 (2, 'Nguyễn Quang Thắng', 'Male', 'Đà Nẵng', 1234564567, 'Accountant'),
 (3, 'Đặng Thị Mầu', 'Other', 'Khánh Yên', 932452345, 'Accountant'),
-(4, 'Con Kiến Huy', 'Other', 'Phú Yên', 1231322345, 'Stocker'),
+(4, 'Con Kiến Huyd', 'Other', 'Phú Yên', 1231322345, 'Stocker'),
 (15, 'Phong', 'Male', 'ss', 0, 'Cashier');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `importproduct`
+-- Cấu trúc bảng cho bảng `import`
 --
 
-CREATE TABLE `importproduct` (
-  `idImportProduct` int(11) NOT NULL,
-  `idProduct` int(11) NOT NULL,
+CREATE TABLE `import` (
+  `idImport` int(11) NOT NULL,
+  `importDate` datetime NOT NULL,
   `idProvider` int(11) NOT NULL,
-  `idTypeProduct` int(11) NOT NULL
+  `totalAmount` decimal(15,2) DEFAULT 0.00
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `importproduct`
+-- Đang đổ dữ liệu cho bảng `import`
 --
 
-INSERT INTO `importproduct` (`idImportProduct`, `idProduct`, `idProvider`, `idTypeProduct`) VALUES
-(1, 1, 3, 3),
-(2, 8, 4, 4),
-(3, 11, 1, 1),
-(4, 6, 2, 2);
+INSERT INTO `import` (`idImport`, `importDate`, `idProvider`, `totalAmount`) VALUES
+(1, '2025-06-26 08:06:14', 1, 0.00);
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `importproductdetail`
+-- Cấu trúc bảng cho bảng `import_detail`
 --
 
-CREATE TABLE `importproductdetail` (
-  `idImportProductDetail` int(11) NOT NULL,
-  `idImportProduct` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  `costImport` float NOT NULL,
-  `costExport` float NOT NULL,
+CREATE TABLE `import_detail` (
+  `idImportDetail` int(11) NOT NULL,
+  `idImport` int(11) NOT NULL,
   `idProduct` int(11) NOT NULL,
-  `amountStock` int(11) NOT NULL
+  `quantity` int(11) NOT NULL,
+  `importPrice` decimal(10,2) NOT NULL,
+  `exportPrice` decimal(10,2) NOT NULL,
+  `totalPrice` decimal(15,2) NOT NULL,
+  `notes` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `importproductdetail`
+-- Đang đổ dữ liệu cho bảng `import_detail`
 --
 
-INSERT INTO `importproductdetail` (`idImportProductDetail`, `idImportProduct`, `amount`, `costImport`, `costExport`, `idProduct`, `amountStock`) VALUES
-(1, 1, 30, 100000000, 200000000, 1, 100),
-(2, 2, 20, 10000000, 23000000, 8, 100),
-(3, 3, 10, 1200000, 1300000, 11, 100),
-(4, 4, 15, 100000, 120000, 6, 100);
+INSERT INTO `import_detail` (`idImportDetail`, `idImport`, `idProduct`, `quantity`, `importPrice`, `exportPrice`, `totalPrice`, `notes`) VALUES
+(1, 1, 1, 50, 10000.00, 15000.00, 500000.00, NULL),
+(2, 1, 2, 30, 12000.00, 15000.00, 360000.00, NULL),
+(3, 1, 11, 20, 25000.00, 30000.00, 500000.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -173,19 +185,19 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`idProduct`, `nameProduct`, `picture`, `descriptionProduct`, `idProvider`, `amountProduct`, `idType`, `importCost`, `exportCost`, `idPromotion`, `idBrand`) VALUES
-(1, 'Táo', '', 'Những quả táo tươi.', 3, 20, 3, 10000, 15000, 1, 0),
-(2, 'Chuối', '', 'Những quả chuối tươi.', 3, 20, 3, 12000, 15000, 3, 0),
-(3, 'Xoài', '', 'Những quả xoài tươi.', 3, 30, 3, 15000, 20000, NULL, 0),
-(4, 'Sầu riêng', '', 'Những quả sầu riêng.', 3, 30, 3, 30000, 45000, NULL, 0),
-(5, 'Chổi', '', 'Những cây chổi.', 2, 50, 2, 10000, 15000, NULL, 0),
-(6, 'Quạt', '', 'Những cây quạt siêu mạnh.', 2, 20, 2, 30000, 42000, NULL, 0),
-(7, 'Giường', '', 'Những chiếc giường siêu êm ái.', 2, 30, 2, 100000, 120000, NULL, 0),
-(8, 'Gấu bông', '', 'Những chú gấu siêu dễ thương', 4, 20, 4, 10000, 12000, NULL, 0),
-(9, 'Hoa tươi', '', 'Nhưng bông hoa xinh đẹp.', 4, 30, 4, 30000, 45000, 3, 0),
-(10, 'Nến thơm', '', 'Những lọ nến thơm phức.', 4, 50, 4, 12000, 16000, NULL, 0),
-(11, 'Gà Rán', '', 'Những miếng gà giòn rụm.', 1, 30, 1, 25000, 30000, NULL, 0),
-(12, 'Coca', '', 'Những lon coca.', 1, 30, 1, 10000, 13000, NULL, 0),
-(13, 'Hamburger', '', 'Ngon là phải biết.', 1, 40, 1, 30000, 45000, NULL, 0);
+(1, 'Táo', 'product1.jpg', 'Những quả táo tươi.', 3, 22, 3, 10000, 15000, 1, 3),
+(2, 'Chuối', 'product2.jpg', 'Những quả chuối tươi.', 3, 20, 3, 12000, 15000, 3, 2),
+(3, 'Xoài', 'product3.jpg', 'Những quả xoài tươi.', 3, 30, 3, 15000, 20000, NULL, 1),
+(4, 'Sầu riêng', 'product4.jpg', 'Những quả sầu riêng.', 3, 30, 3, 30000, 45000, NULL, 2),
+(5, 'Chổi', 'product5.jpg', 'Những cây chổi.', 2, 50, 2, 10000, 15000, NULL, 1),
+(6, 'Quạt', 'product6.jpg', 'Những cây quạt siêu mạnh.', 2, 20, 2, 30000, 42000, 1, 1),
+(7, 'Giường', 'product7.jpg', 'Những chiếc giường siêu êm ái.', 2, 30, 2, 100000, 120000, NULL, 1),
+(8, 'Gấu bông', 'product8.jpg', 'Những chú gấu siêu dễ thương', 4, 20, 4, 10000, 12000, NULL, 1),
+(9, 'Hoa tươi', 'product9.jpg', 'Nhưng bông hoa xinh đẹp.', 4, 30, 4, 30000, 45000, 3, 1),
+(10, 'Nến thơm', 'product10.jpg', 'Những lọ nến thơm phức.', 4, 50, 4, 12000, 16000, NULL, 1),
+(11, 'Gà Rán', 'product11.jpg', 'Những miếng gà giòn rụm.', 1, 30, 1, 25000, 30000, NULL, 2),
+(12, 'Coca', 'product12.jpg', 'Những lon coca.', 1, 300, 1, 10000, 13000, NULL, 1),
+(13, 'Hamburger', 'product13.jpg', 'Ngon là phải biết.', 1, 10, 1, 30000, 45000, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -224,18 +236,19 @@ CREATE TABLE `provider` (
   `nameProvider` varchar(255) NOT NULL,
   `addressProvider` varchar(255) NOT NULL,
   `phoneProvider` int(11) NOT NULL,
-  `emailProvider` varchar(255) NOT NULL
+  `emailProvider` varchar(255) NOT NULL,
+  `idType` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `provider`
 --
 
-INSERT INTO `provider` (`idProvider`, `nameProvider`, `addressProvider`, `phoneProvider`, `emailProvider`) VALUES
-(1, 'Công Ty Thức Ăn Nhanh SGU', '14/5 đường An Bình , phường 5 , quận 5 , Thành Phố Hồ Chí Minh', 10012123, 'sgu@gmail.com'),
-(2, 'Công Ty Vật Liệu SGU', '9/2 đường Nguyễn Biểu , phường 11, quận 5 , Thành Phố Hồ Chí Minh', 10091003, 'sgu123@gmail.com'),
-(3, 'Công Ty Hoa Quả Tươi SGU', '14/7 đường An Dương Vương , phường 10 , quận 5 , Thành Phố Hồ Chí Minh', 10001000, 'sgu321@gmail.com'),
-(4, 'Cửa Hàng Quà Tặng SGU', '122/2 đường Điện Biên Phủ , phường 11 , quận 11, thành phố Hồ Chí Minh', 10000001, 'sgu13@gmail.com');
+INSERT INTO `provider` (`idProvider`, `nameProvider`, `addressProvider`, `phoneProvider`, `emailProvider`, `idType`) VALUES
+(1, 'Công Ty Thức Ăn Nhanh SGU', '14/5 đường An Bình , phường 5 , quận 5 , Thành Phố Hồ Chí Minh', 10012123, 'sgu@gmail.com', 1),
+(2, 'Công Ty Vật Liệu SGU', '9/2 đường Nguyễn Biểu , phường 11, quận 5 , Thành Phố Hồ Chí Minh', 10091003, 'sgu123@gmail.com', 2),
+(3, 'Công Ty Hoa Quả Tươi SGU', '14/7 đường An Dương Vương , phường 10 , quận 5 , Thành Phố Hồ Chí Minh', 10001000, 'sgu321@gmail.com', 3),
+(4, 'Cửa Hàng Quà Tặng SGU', '122/2 đường Điện Biên Phủ , phường 11 , quận 11, thành phố Hồ Chí Minh', 10000001, 'sgu13@gmail.com', 4);
 
 -- --------------------------------------------------------
 
@@ -283,9 +296,9 @@ CREATE TABLE `typeproduct` (
 --
 
 INSERT INTO `typeproduct` (`idType`, `nameType`, `descriptionType`, `inventory`, `typeSell`) VALUES
-(1, 'Thức Ăn', 'Bao gồm thức ăn dinh dưỡng và thức ăn nhanh', 1005, 'Số lượng'),
+(1, 'Thức ăn', 'Bao gồm thức ăn dinh dưỡng và thức ăn nhanh', 340, 'Số lượng'),
 (2, 'Đồ gia dụng', 'Bao gồm các vật dụng cần thiết cho mọi nhà.', 100, 'Số lượng'),
-(3, 'Hoa quả', 'Bao gồm các trái cây tươi.', 100, 'Khối lượng'),
+(3, 'Hoa quả', 'Bao gồm các trái cây tươi.', 102, 'Khối lượng'),
 (4, 'Quà Tặng', 'Bao gồm các món quà xinh đẹp có thể tặng người đặc biệt vào những dịp đặc biệt.', 100, 'Số lượng');
 
 -- --------------------------------------------------------
@@ -314,6 +327,12 @@ INSERT INTO `useraccount` (`idUser`, `nameUser`, `passWord`, `roleUser`) VALUES
 --
 
 --
+-- Chỉ mục cho bảng `brand`
+--
+ALTER TABLE `brand`
+  ADD PRIMARY KEY (`idBrand`);
+
+--
 -- Chỉ mục cho bảng `employee`
 --
 ALTER TABLE `employee`
@@ -321,23 +340,16 @@ ALTER TABLE `employee`
   ADD UNIQUE KEY `idEmployee` (`idEmployee`);
 
 --
--- Chỉ mục cho bảng `importproduct`
+-- Chỉ mục cho bảng `import`
 --
-ALTER TABLE `importproduct`
-  ADD PRIMARY KEY (`idImportProduct`),
-  ADD UNIQUE KEY `idImportProduct` (`idImportProduct`),
-  ADD KEY `importProduct_fk1` (`idProduct`),
-  ADD KEY `importProduct_fk2` (`idProvider`),
-  ADD KEY `importProduct_fk3` (`idTypeProduct`);
+ALTER TABLE `import`
+  ADD PRIMARY KEY (`idImport`);
 
 --
--- Chỉ mục cho bảng `importproductdetail`
+-- Chỉ mục cho bảng `import_detail`
 --
-ALTER TABLE `importproductdetail`
-  ADD PRIMARY KEY (`idImportProductDetail`),
-  ADD UNIQUE KEY `idImportProductDetail` (`idImportProductDetail`),
-  ADD KEY `importProductDetail_fk1` (`idImportProduct`),
-  ADD KEY `importProductDetail_fk5` (`idProduct`);
+ALTER TABLE `import_detail`
+  ADD PRIMARY KEY (`idImportDetail`);
 
 --
 -- Chỉ mục cho bảng `inforuser`
@@ -375,7 +387,8 @@ ALTER TABLE `promotion`
 --
 ALTER TABLE `provider`
   ADD PRIMARY KEY (`idProvider`),
-  ADD UNIQUE KEY `idProvider` (`idProvider`);
+  ADD UNIQUE KEY `idProvider` (`idProvider`),
+  ADD KEY `provider_fk_type` (`idType`);
 
 --
 -- Chỉ mục cho bảng `salary`
@@ -404,22 +417,28 @@ ALTER TABLE `useraccount`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `brand`
+--
+ALTER TABLE `brand`
+  MODIFY `idBrand` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT cho bảng `employee`
 --
 ALTER TABLE `employee`
   MODIFY `idEmployee` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT cho bảng `importproduct`
+-- AUTO_INCREMENT cho bảng `import`
 --
-ALTER TABLE `importproduct`
-  MODIFY `idImportProduct` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `import`
+  MODIFY `idImport` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT cho bảng `importproductdetail`
+-- AUTO_INCREMENT cho bảng `import_detail`
 --
-ALTER TABLE `importproductdetail`
-  MODIFY `idImportProductDetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `import_detail`
+  MODIFY `idImportDetail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `inforuser`
@@ -431,7 +450,7 @@ ALTER TABLE `inforuser`
 -- AUTO_INCREMENT cho bảng `product`
 --
 ALTER TABLE `product`
-  MODIFY `idProduct` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `idProduct` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT cho bảng `promotion`
@@ -443,7 +462,7 @@ ALTER TABLE `promotion`
 -- AUTO_INCREMENT cho bảng `provider`
 --
 ALTER TABLE `provider`
-  MODIFY `idProvider` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idProvider` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `salary`
@@ -468,21 +487,6 @@ ALTER TABLE `useraccount`
 --
 
 --
--- Các ràng buộc cho bảng `importproduct`
---
-ALTER TABLE `importproduct`
-  ADD CONSTRAINT `importProduct_fk1` FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`),
-  ADD CONSTRAINT `importProduct_fk2` FOREIGN KEY (`idProvider`) REFERENCES `provider` (`idProvider`),
-  ADD CONSTRAINT `importProduct_fk3` FOREIGN KEY (`idTypeProduct`) REFERENCES `typeproduct` (`idType`);
-
---
--- Các ràng buộc cho bảng `importproductdetail`
---
-ALTER TABLE `importproductdetail`
-  ADD CONSTRAINT `importProductDetail_fk1` FOREIGN KEY (`idImportProduct`) REFERENCES `importproduct` (`idImportProduct`),
-  ADD CONSTRAINT `importProductDetail_fk5` FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`);
-
---
 -- Các ràng buộc cho bảng `inforuser`
 --
 ALTER TABLE `inforuser`
@@ -495,6 +499,12 @@ ALTER TABLE `product`
   ADD CONSTRAINT `product_fk3` FOREIGN KEY (`idProvider`) REFERENCES `provider` (`idProvider`),
   ADD CONSTRAINT `product_fk5` FOREIGN KEY (`idType`) REFERENCES `typeproduct` (`idType`),
   ADD CONSTRAINT `product_fk8` FOREIGN KEY (`idPromotion`) REFERENCES `promotion` (`idPromotion`);
+
+--
+-- Các ràng buộc cho bảng `provider`
+--
+ALTER TABLE `provider`
+  ADD CONSTRAINT `provider_fk_type` FOREIGN KEY (`idType`) REFERENCES `typeproduct` (`idType`);
 
 --
 -- Các ràng buộc cho bảng `salary`

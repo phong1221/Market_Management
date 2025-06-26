@@ -32,6 +32,7 @@
   border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
+  margin-top: 5px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
@@ -422,13 +423,6 @@
   color: #718096;
 }
 
-/* Action buttons container */
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
 /* Enhanced modal backdrop */
 .modal-overlay {
   animation: backdrop-fade-in 0.3s ease;
@@ -441,5 +435,26 @@
   to {
     opacity: 1;
   }
+}
+
+/* Stock Badge Styles */
+.stock-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  min-width: 90px; 
+  letter-spacing: 0.5px;
+}
+
+.stock-badge.in-stock {
+  background-color: #28a745; /* Green */
+}
+
+.stock-badge.out-of-stock {
+  background-color: #dc3545; /* Red */
 }
 
