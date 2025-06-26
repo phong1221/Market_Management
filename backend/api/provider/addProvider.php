@@ -27,7 +27,7 @@ require_once '../../config/Database.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Kiểm tra dữ liệu đầu vào
-if (!isset($data['nameProvider'], $data['addressProvider'], $data['phoneProvider'], $data['emailProvider'])) {
+if (!isset($data['nameProvider'], $data['addressProvider'], $data['phoneProvider'], $data['emailProvider'], $data['idType'])) {
     echo json_encode([
         "success" => false,
         "message" => "Thiếu thông tin nhà cung cấp"
@@ -47,14 +47,15 @@ if (!$conn) {
     exit();
 }
 
-// Chuẩn bị truy vấn thêm người dùng
-$stmt = $conn->prepare("INSERT INTO provider (nameProvider, addressProvider, phoneProvider, emailProvider) VALUES (?, ?, ?, ?)");
+// Chuẩn bị truy vấn thêm nhà cung cấp
+$stmt = $conn->prepare("INSERT INTO provider (nameProvider, addressProvider, phoneProvider, emailProvider, idType) VALUES (?, ?, ?, ?, ?)");
 $stmt->bind_param(
-    "ssss",
+    "ssssi",
     $data['nameProvider'],
     $data['addressProvider'],
     $data['phoneProvider'],
-    $data['emailProvider']
+    $data['emailProvider'],
+    $data['idType']
 );
 
 if ($stmt->execute()) {

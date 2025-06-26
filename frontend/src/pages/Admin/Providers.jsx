@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { fetchProvider, addProvider, updateProvider, deleteProvider } from '../../services/providerService';
+import { fetchTypeProduct } from '../../services/typeProductService';
 import '../../css/notification.css';
 
 const Providers = () => {
   const [providers, setProviders] = useState([])
+  const [typeProducts, setTypeProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [formType, setFormType] = useState('add')
@@ -12,7 +14,8 @@ const Providers = () => {
     nameProvider: '',
     addressProvider: '',
     phoneProvider: '',
-    emailProvider: ''
+    emailProvider: '',
+    idType: ''
   })
   const [notification, setNotification] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
@@ -23,6 +26,7 @@ const Providers = () => {
 
   useEffect(() => {
     fetchProviders()
+    fetchTypeProducts()
   }, [])
 
   useEffect(() => {
@@ -36,6 +40,7 @@ const Providers = () => {
     setLoading(true)
     try {
       const data = await fetchProvider();
+      console.log("Fetched providers:", data);
       setProviders(data)
       
       // Tự động tạo id mới khi thêm
@@ -51,6 +56,16 @@ const Providers = () => {
     }
   }
 
+  const fetchTypeProducts = async () => {
+    try {
+      const data = await fetchTypeProduct();
+      console.log("Fetched type products:", data);
+      setTypeProducts(data);
+    } catch (error) {
+      console.error('Lỗi khi tải loại sản phẩm:', error);
+    }
+  }
+
   const handleAdd = () => {
     setFormType('add')
     const maxId = Math.max(...providers.map(provider => parseInt(provider.idProvider, 10)), 0);
@@ -59,19 +74,22 @@ const Providers = () => {
       nameProvider: '',
       addressProvider: '',
       phoneProvider: '',
-      emailProvider: ''
+      emailProvider: '',
+      idType: ''
     })
     setShowForm(true)
   }
 
   const handleEdit = (provider) => {
+    console.log("Editing provider:", provider);
     setFormType('edit')
     setFormData({
       idProvider: provider.idProvider,
       nameProvider: provider.nameProvider,
       addressProvider: provider.addressProvider,
       phoneProvider: provider.phoneProvider,
-      emailProvider: provider.emailProvider
+      emailProvider: provider.emailProvider,
+      idType: provider.idType ? provider.idType.toString() : ''
     })
     setShowForm(true)
   }
@@ -80,6 +98,10 @@ const Providers = () => {
     e.preventDefault()
     if (!formData.nameProvider.trim()) {
       setNotification({ message: 'Vui lòng nhập tên nhà cung cấp', type: 'error' })
+      return
+    }
+    if (!formData.idType) {
+      setNotification({ message: 'Vui lòng chọn loại sản phẩm', type: 'error' })
       return
     }
     try {
@@ -146,12 +168,15 @@ const Providers = () => {
           return item.phoneProvider.toLowerCase().includes(searchLower)
         case 'emailProvider':
           return item.emailProvider.toLowerCase().includes(searchLower)
+        case 'nameType':
+          return item.nameType && item.nameType.toLowerCase().includes(searchLower)
         case 'all':
           return (
             item.nameProvider.toLowerCase().includes(searchLower) ||
             item.addressProvider.toLowerCase().includes(searchLower) ||
             item.phoneProvider.toLowerCase().includes(searchLower) ||
-            item.emailProvider.toLowerCase().includes(searchLower)
+            item.emailProvider.toLowerCase().includes(searchLower) ||
+            (item.nameType && item.nameType.toLowerCase().includes(searchLower))
           )
         default:
           return true
@@ -284,6 +309,7 @@ const Providers = () => {
           <option value="addressProvider">Địa chỉ</option>
           <option value="phoneProvider">Số điện thoại</option>
           <option value="emailProvider">Email</option>
+          <option value="nameType">Loại sản phẩm</option>
         </select>
       </div>
 
@@ -342,6 +368,28 @@ const Providers = () => {
                   required
                 />
               </div>
+              <div className="form-group">
+                <label className="form-label">Loại sản phẩm:</label>
+                <select
+                  value={formData.idType || ''}
+                  onChange={(e) => {
+                    console.log("Selected idType:", e.target.value);
+                    setFormData({...formData, idType: e.target.value});
+                  }}
+                  className="form-input"
+                  required
+                >
+                  <option value="">Chọn loại sản phẩm</option>
+                  {typeProducts.map((type) => {
+                    console.log("Type option:", type);
+                    return (
+                      <option key={type.idType} value={type.idType}>
+                        {type.nameType}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
               <div className="form-actions">
                 <button type="submit" className="btn btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
                 <button 
@@ -366,35 +414,40 @@ const Providers = () => {
               <th>Địa chỉ</th>
               <th>Số điện thoại</th>
               <th>Email</th>
+              <th>Loại sản phẩm</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {currentProviders.map((provider) => (
-              <tr key={provider.idProvider}>
-                <td>{provider.idProvider}</td>
-                <td>{provider.nameProvider}</td>
-                <td>{provider.addressProvider}</td>
-                <td>{provider.phoneProvider}</td>
-                <td>{provider.emailProvider}</td>
-                <td>
-                  <button 
-                    className="btn btn-primary btn-sm action-anim"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
-                    onClick={() => handleEdit(provider)}
-                  >
-                    Sửa
-                  </button>
-                  <button 
-                    className="btn btn-secondary btn-sm action-anim"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
-                    onClick={() => handleDelete(provider.idProvider)}
-                  >
-                    Xóa
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {currentProviders.map((provider) => {
+              console.log("Rendering provider:", provider);
+              return (
+                <tr key={provider.idProvider}>
+                  <td>{provider.idProvider}</td>
+                  <td>{provider.nameProvider}</td>
+                  <td>{provider.addressProvider}</td>
+                  <td>{provider.phoneProvider}</td>
+                  <td>{provider.emailProvider}</td>
+                  <td>{provider.nameType || `Chưa phân loại (idType: ${provider.idType})`}</td>
+                  <td>
+                    <button 
+                      className="btn btn-primary btn-sm action-anim"
+                      style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
+                      onClick={() => handleEdit(provider)}
+                    >
+                      Sửa
+                    </button>
+                    <button 
+                      className="btn btn-secondary btn-sm action-anim"
+                      style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
+                      onClick={() => handleDelete(provider.idProvider)}
+                    >
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

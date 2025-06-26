@@ -442,45 +442,36 @@ const Products = () => {
               <th>Giá nhập</th>
               <th>Giá bán</th>
               <th>Thương hiệu</th>
-              <th>Khuyến mãi</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
-              <tr key={product.idProduct} style={{ animationDelay: `${index * 0.1}s` }}>
+            {products.map((product) => (
+              <tr key={product.idProduct}>
                 <td>{product.idProduct}</td>
                 <td>{renderProductImage(product)}</td>
-                <td className="product-name">{product.nameProduct}</td>
-                <td className="product-description">{product.descriptionProduct}</td>
-                <td>{providers.find(p => p.idProvider === product.idProvider)?.nameProvider}</td>
+                <td>{product.nameProduct}</td>
+                <td>{product.descriptionProduct}</td>
+                <td>{providers.find(p => p.idProvider === product.idProvider)?.nameProvider || 'N/A'}</td>
                 <td>
-                  <span className={`status-badge ${product.amountProduct > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                    {product.amountProduct > 0 ? `${product.amountProduct} in stock` : 'Out of stock'}
+                  <span className={`stock-badge ${product.amountProduct > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                    {product.amountProduct > 0 ? `${product.amountProduct} IN STOCK` : 'OUT OF STOCK'}
                   </span>
                 </td>
-                <td>{categories.find(c => c.idType === product.idType)?.nameType}</td>
-                <td className="price import">{product.importCost?.toLocaleString()} VNĐ</td>
-                <td className="price export">{product.exportCost?.toLocaleString()} VNĐ</td>
-                <td>{brands.find(b => b.idBrand === product.idBrand)?.nameBrand}</td>
+                <td>{categories.find(c => c.idType === product.idType)?.nameType || 'N/A'}</td>
+                <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.importCost)}</td>
+                <td>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.exportCost)}</td>
+                <td>{brands.find(b => b.idBrand === product.idBrand)?.nameBrand || 'N/A'}</td>
                 <td>
-                  {(() => {
-                    const promotion = promotions.find(p => p.idPromotion === parseInt(product.idPromotion));
-                    console.log('Product:', product.nameProduct, 'idPromotion:', product.idPromotion, 'Found promotion:', promotion);
-                    return promotion ? promotion.namePromotion : 'Không có';
-                  })()}
-                </td>
-                <td className="action-buttons">
-                  <button 
+                  <button
                     className="btn btn-primary btn-sm"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
+                    style={{ marginRight: '8px' }}
                     onClick={() => handleEdit(product)}
                   >
                     Sửa
                   </button>
-                  <button 
+                  <button
                     className="btn btn-secondary btn-sm"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(product.idProduct)}
                   >
                     Xóa

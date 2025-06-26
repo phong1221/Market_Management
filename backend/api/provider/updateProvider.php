@@ -27,7 +27,7 @@ require_once '../../config/Database.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 // Kiểm tra dữ liệu đầu vào
-if (!isset($data['idProvider'], $data['nameProvider'], $data['addressProvider'], $data['phoneProvider'], $data['emailProvider'])) {
+if (!isset($data['idProvider'], $data['nameProvider'], $data['addressProvider'], $data['phoneProvider'], $data['emailProvider'], $data['idType'])) {
     echo json_encode([
         "success" => false,
         "message" => "Thiếu thông tin nhà cung cấp"
@@ -42,13 +42,14 @@ if (!$conn) {
     exit();
 }
 
-$stmt = $conn->prepare("UPDATE provider SET nameProvider = ?, addressProvider = ?, phoneProvider = ?, emailProvider = ? WHERE idProvider = ?");
+$stmt = $conn->prepare("UPDATE provider SET nameProvider = ?, addressProvider = ?, phoneProvider = ?, emailProvider = ?, idType = ? WHERE idProvider = ?");
 $stmt->bind_param(
-    "ssssi",
-$data['nameProvider'],
+    "ssssii",
+    $data['nameProvider'],
     $data['addressProvider'],
     $data['phoneProvider'],
     $data['emailProvider'],
+    $data['idType'],
     $data['idProvider']
 );
 
