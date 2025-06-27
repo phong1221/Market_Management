@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 
 // Components
@@ -17,31 +17,33 @@ import Imports from './pages/Admin/Imports.jsx'
 import Salary from './pages/Admin/Salary.jsx'
 import Brands from './pages/Admin/Brands.jsx'
 import Login from './pages/Admin/Login.jsx'
+import Orders from './pages/Admin/Order'
 // import AccountInfo from './pages/Admin/AccountInfo.jsx' 
+
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+
   return (
-    <Router>
-      <div className="App">
-        <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/employees" element={<Employees />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/providers" element={<Providers />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/promotions" element={<Promotions />} />
-            <Route path="/imports" element={<Imports />} />
-            <Route path="/salary" element={<Salary />} />
-            <Route path="/brands" element={<Brands />} />
-            <Route path="/login" element={<Login />} />
-            {/* <Route path="/account-info" element={<AccountInfo />} /> */}
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <div className="App">
+      <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/providers" element={<Providers />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/promotions" element={<Promotions />} />
+          <Route path="/imports" element={<Imports />} />
+          <Route path="/salary" element={<Salary />} />
+          <Route path="/brands" element={<Brands />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/orders" element={<Orders />} />
+          {/* <Route path="/account-info" element={<AccountInfo />} /> */}
+        </Routes>
+      </main>
+    </div>
   )
 }
 

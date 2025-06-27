@@ -100,6 +100,27 @@ try {
         if (!$detailStmt->execute()) {
             throw new Exception("Lỗi khi thêm chi tiết sản phẩm: " . $detailStmt->error);
         }
+        
+        // Cập nhật số lượng sản phẩm trong bảng product
+        $updateProductSql = "UPDATE product SET amountProduct = amountProduct + ? WHERE idProduct = ?";
+        $updateProductStmt = $conn->prepare($updateProductSql);
+        $updateProductStmt->bind_param("di", $item['quantity'], $item['idProduct']);
+        if (!$updateProductStmt->execute()) {
+            throw new Exception("Lỗi khi cập nhật số lượng sản phẩm: " . $updateProductStmt->error);
+        }
+        $updateProductStmt->close();
+
+        // Lấy idType của sản phẩm để cập nhật tồn kho danh mục
+        $getTypeSql = "SELECT idType FROM product WHERE idProduct = ?";
+        $getTypeStmt = $conn->prepare($getTypeSql);
+        $getTypeStmt->bind_param("i", $item['idProduct']);
+        $getTypeStmt->execute();
+        $getTypeResult = $getTypeStmt->get_result();
+        if ($rowType = $getTypeResult->fetch_assoc()) {
+            require_once '../typeProduct/updateInventory.php';
+            updateInventory($conn, $rowType['idType']);
+        }
+        $getTypeStmt->close();
     }
     
     // 3. Cập nhật tổng tiền import

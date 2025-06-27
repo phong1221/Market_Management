@@ -1,0 +1,226 @@
+/* General page styles */
+.orders-page {
+    padding: 2rem;
+    background-color: #f4f7fa;
+    min-height: calc(100vh - 60px); /* Adjust based on header height */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.orders-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.orders-page-title {
+    color: #334155;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* Loading state */
+.orders-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    font-size: 1.2rem;
+    color: #64748b;
+}
+
+/* Table styles */
+.orders-table-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.orders-data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-data-table th,
+.orders-data-table td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.orders-data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.orders-data-table tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* Action Buttons */
+.orders-action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.orders-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.orders-btn-info {
+    background-color: #3b82f6;
+    color: white;
+}
+.orders-btn-info:hover {
+    background-color: #2563eb;
+}
+
+.orders-btn-warning {
+    background-color: #f97316;
+    color: white;
+}
+.orders-btn-warning:hover {
+    background-color: #ea580c;
+}
+
+.orders-btn-primary {
+    background-color: #16a34a;
+    color: white;
+}
+.orders-btn-primary:hover {
+    background-color: #15803d;
+}
+
+.orders-btn-secondary {
+    background-color: #64748b;
+    color: white;
+}
+.orders-btn-secondary:hover {
+    background-color: #475569;
+}
+
+
+/* Status Badge */
+.orders-status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+
+.status-not-confirm {
+    background-color: #fef9c3; /* yellow-100 */
+    color: #a16207; /* yellow-700 */
+}
+
+.status-confirmed {
+    background-color: #dbeafe; /* blue-100 */
+    color: #1d4ed8; /* blue-700 */
+}
+
+.status-completed {
+    background-color: #dcfce7; /* green-100 */
+    color: #15803d; /* green-700 */
+}
+
+.status-cancelled {
+    background-color: #fee2e2; /* red-100 */
+    color: #b91c1c; /* red-700 */
+}
+
+
+/* Modal Styles */
+.orders-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.orders-modal {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slide-down 0.3s ease-out;
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.orders-modal h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #334155;
+}
+
+.orders-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.orders-modal .orders-data-table {
+    margin-bottom: 1.5rem;
+}
+
+/* Form elements within modal */
+.orders-form-group {
+    margin-bottom: 1rem;
+}
+
+.orders-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #475569;
+}
+
+.orders-form-input,
+.orders-form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+.orders-form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.orders-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+} 

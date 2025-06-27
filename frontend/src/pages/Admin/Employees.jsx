@@ -23,9 +23,11 @@ const Employees = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [employeesWithSalary, setEmployeesWithSalary] = useState([]);
 
   useEffect(() => { 
     fetchEmployees()
+    fetchEmployeesWithSalary()
   }, [])
 
   useEffect(() => {
@@ -54,6 +56,17 @@ const Employees = () => {
       setNotification({ message: "Lỗi khi tải dữ liệu: " + error.message, type: 'error' });
     } finally {
       setLoading(false);
+    }
+  }
+
+  const fetchEmployeesWithSalary = async () => {
+    try {
+      const response = await axios.get('http://localhost/market_management/backend/api/salary/getSalary.php');
+      const data = response.data && Array.isArray(response.data.data) ? response.data.data : [];
+      const employeeIds = [...new Set(data.map(salary => salary.idEmployee))];
+      setEmployeesWithSalary(employeeIds);
+    } catch (error) {
+      console.error('Lỗi khi tải dữ liệu lương:', error);
     }
   }
 
@@ -113,18 +126,36 @@ const Employees = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    setConfirmDelete(id);
+  const handleDelete = (importItem) => {
+    setConfirmDelete(importItem);
   };
 
   const confirmDeleteEmployee = async (id) => {
     try {
-      const success = await deleteEmployee(id);
-      if (success) {
+      const result = await deleteEmployee(id);
+      if (result.success) {
+        // Tính toán số trang mới sau khi xóa dựa trên dữ liệu hiện tại
+        const currentTotalItems = filteredEmployees.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
+        const itemsOnCurrentPage = currentEmployees.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        // Nếu trang hiện tại lớn hơn số trang mới và có ít nhất 1 trang, chuyển về trang đầu tiên
+        // Hoặc nếu xóa phần tử cuối cùng của trang và không phải trang đầu tiên, chuyển về trang trước
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchEmployees();
-        setNotification({ message: "Xóa nhân viên thành công!", type: "success" });
+        fetchEmployeesWithSalary(); // Cập nhật danh sách nhân viên có lương
+        setNotification({ message: result.message, type: "success" });
       } else {
-        setNotification({ message: "Xóa thất bại!", type: "error" });
+        setNotification({ message: result.message, type: "error" });
       }
     } catch (error) {
       setNotification({ message: "Lỗi khi xóa: " + error.message, type: "error" });
@@ -163,7 +194,14 @@ const Employees = () => {
 
   const filteredEmployees = filterData();
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
 
@@ -186,7 +224,7 @@ const Employees = () => {
       pages.push(
         <button
           key={i}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          className={`employees-pagination-button ${currentPage === i ? 'active' : ''}`}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -195,16 +233,16 @@ const Employees = () => {
     }
 
     return (
-      <div className="pagination-container">
+      <div className="employees-pagination-container">
         <button
-          className="pagination-button"
+          className="employees-pagination-button"
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
         >
           &laquo;
         </button>
         <button
-          className="pagination-button"
+          className="employees-pagination-button"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -212,20 +250,20 @@ const Employees = () => {
         </button>
         {pages}
         <button
-          className="pagination-button"
+          className="employees-pagination-button"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           &rsaquo;
         </button>
         <button
-          className="pagination-button"
+          className="employees-pagination-button"
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
         >
           &raquo;
         </button>
-        <span className="pagination-info">
+        <span className="employees-pagination-info">
           Trang {currentPage} / {totalPages}
         </span>
       </div>
@@ -234,38 +272,38 @@ const Employees = () => {
 
   console.log('filteredEmployees:', filteredEmployees.length, filteredEmployees);
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="employees-loading">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="employees-page">
       {notification && (
-        <div className={`notification-container notification-${notification.type}`}>
+        <div className={`employees-notification-container employees-notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="employees-modal-overlay">
+          <div className="employees-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa nhân viên này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeleteEmployee(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="employees-form-actions">
+              <button className="employees-btn employees-btn-danger" onClick={() => confirmDeleteEmployee(confirmDelete)}>Xóa</button>
+              <button className="employees-btn employees-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý nhân viên</h1>
+      <div className="employees-page-header">
+        <h1 className="employees-page-title">Quản lý nhân viên</h1>
         <button 
-          className="btn btn-primary" 
+          className="employees-btn employees-btn-primary" 
           onClick={handleAdd}
         >
           Thêm nhân viên mới
         </button>
       </div>
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="employees-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -274,8 +312,7 @@ const Employees = () => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="modal-input"
-          style={{ flex: 1 }}
+          className="employees-form-input"
         />
         <select
           value={searchCriteria}
@@ -283,8 +320,7 @@ const Employees = () => {
             setSearchCriteria(e.target.value);
             setCurrentPage(1);
           }}
-          className="modal-input"
-          style={{ width: 'auto' }}
+          className="employees-form-input"
         >
           <option value="all">Tất cả</option>
           <option value="nameEmployee">Tên nhân viên</option>
@@ -294,35 +330,35 @@ const Employees = () => {
       </div>
 
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="employees-modal-overlay">
+          <div className="employees-modal">
             <h2>{modalType === "add" ? "Thêm nhân viên mới" : "Sửa nhân viên"}</h2>
-            <form onSubmit={handleSave} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleSave} className="employees-form">
+              <div className="employees-form-group">
+                <label className="employees-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.idEmployee}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên nhân viên:</label>
+              <div className="employees-form-group">
+                <label className="employees-form-label">Tên nhân viên:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.nameEmployee}
                   onChange={e => setEditingEmployee({ ...editingEmployee, nameEmployee: e.target.value })}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Giới tính:</label>
+              <div className="employees-form-group">
+                <label className="employees-form-label">Giới tính:</label>
                 <select
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.genderEmployee}
                   onChange={(e) => setEditingEmployee({...editingEmployee, genderEmployee: e.target.value})}
                 >
@@ -332,32 +368,32 @@ const Employees = () => {
                 </select>
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Địa chỉ:</label>
+              <div className="employees-form-group">
+                <label className="employees-form-label">Địa chỉ:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.addressEmployee}
                   onChange={(e) => setEditingEmployee({...editingEmployee, addressEmployee: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Số điện thoại:</label>
+              <div className="employees-form-group">
+                <label className="employees-form-label">Số điện thoại:</label>
                 <input
                   type="tel"
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.phoneEmployee}
                   onChange={(e) => setEditingEmployee({...editingEmployee, phoneEmployee: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Chức vụ:</label>
+              <div className="employees-form-group">
+                <label className="employees-form-label">Chức vụ:</label>
                 <select
-                  className="form-input"
+                  className="employees-form-input"
                   value={editingEmployee.roleEmployee}
                   onChange={(e) => setEditingEmployee({...editingEmployee, roleEmployee: e.target.value})}
                 >
@@ -368,17 +404,17 @@ const Employees = () => {
                 </select>
               </div>
               
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
+              <div className="employees-form-actions">
+                <button type="submit" className="employees-btn employees-btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
+                <button type="button" className="employees-btn employees-btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="employees-table-container">
+        <table className="employees-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -401,13 +437,15 @@ const Employees = () => {
                 <td>{employee.roleEmployee}</td>
                 <td>
                   <button 
-                    className="btn btn-secondary btn-sm"
+                    className={`employees-btn employees-btn-sm ${employeesWithSalary.includes(employee.idEmployee) ? 'employees-btn-warning' : 'employees-btn-secondary'}`}
                     onClick={() => handleDelete(employee.idEmployee)}
+                    title={employeesWithSalary.includes(employee.idEmployee) ? 'Nhân viên này có dữ liệu lương, không thể xóa' : 'Xóa nhân viên'}
+                    disabled={employeesWithSalary.includes(employee.idEmployee)}
                   >
-                    Xóa
+                    {employeesWithSalary.includes(employee.idEmployee) ? '🔒 Không thể xóa' : 'Xóa'}
                   </button>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className="employees-btn employees-btn-primary employees-btn-sm"
                     style={{ marginLeft: 8 }}
                     onClick={() => handleEdit(employee)}
                   >

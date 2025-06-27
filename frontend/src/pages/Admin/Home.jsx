@@ -1,11 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
+import '../../css/home.css'
 const Home = () => {
   const dashboardItems = [
     {
       title: 'Quản lý người dùng',
-      description: 'Quản lý tài khoản người dùng và phân quyền',
+      description: 'Quản lý tài khoản người dùng',
       path: '/users',
       icon: '👥'
     },
@@ -63,11 +63,17 @@ const Home = () => {
       description: 'Quản lý lương và thưởng',
       path: '/salary',
       icon: '💰'
+    },
+    {
+      title: 'Xử lí đơn hàng',
+      description: 'Xử lí đơn hàng do người dùng đặt',
+      path: '/order',
+      icon: '🎟️'
     }
   ]
 
   return (
-    <div className="page">
+    <div className="home-page">
       <h1 className="page-title">Dashboard - Quản lý Siêu thị</h1>
       
       <div className="dashboard-grid">

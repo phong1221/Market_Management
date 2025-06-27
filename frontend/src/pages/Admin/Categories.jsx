@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { fetchTypeProduct, addTypeProduct, updateTypeProduct, deleteTypeProduct } from '../../services/typeProductService'
 import '../../css/notification.css'
+import '../../css/typeProduct.css'
 import TypeProduct from '../../models/typeProduct'
 
 const Categories = () => {
@@ -86,6 +87,19 @@ const Categories = () => {
     try {
       const result = await deleteTypeProduct(id)
       if (result.success) {
+        const currentTotalItems = filteredData.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        const itemsOnCurrentPage = currentData.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchData()
         setNotification({ message: 'Xóa danh mục thành công', type: 'success' })
       } else {
@@ -128,7 +142,14 @@ const Categories = () => {
 
   const filteredData = filterData()
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const currentData = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
   const handlePageChange = (page) => {
@@ -138,11 +159,17 @@ const Categories = () => {
   const renderPagination = () => {
     if (totalPages <= 1) return null
     const pages = []
-    for (let i = 1; i <= totalPages; i++) {
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+    for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
           key={i}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          className={`typeProduct-pagination-button ${currentPage === i ? 'active' : ''}`}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -150,9 +177,37 @@ const Categories = () => {
       )
     }
     return (
-      <div className="pagination-container">
+      <div className="typeProduct-pagination-container">
+        <button
+          className="typeProduct-pagination-button"
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === 1}
+        >
+          &laquo;
+        </button>
+        <button
+          className="typeProduct-pagination-button"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          &lsaquo;
+        </button>
         {pages}
-        <span className="pagination-info">
+        <button
+          className="typeProduct-pagination-button"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          &rsaquo;
+        </button>
+        <button
+          className="typeProduct-pagination-button"
+          onClick={() => handlePageChange(totalPages)}
+          disabled={currentPage === totalPages}
+        >
+          &raquo;
+        </button>
+        <span className="typeProduct-pagination-info">
           Trang {currentPage} / {totalPages}
         </span>
       </div>
@@ -164,48 +219,46 @@ const Categories = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="typeProduct-loading">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="typeProduct-page">
       {notification && (
         <div className={`notification-container notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="typeProduct-modal-overlay">
+          <div className="typeProduct-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa danh mục này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeleteItem(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="typeProduct-form-actions">
+              <button className="typeProduct-btn typeProduct-btn-danger" onClick={() => confirmDeleteItem(confirmDelete)}>Xóa</button>
+              <button className="typeProduct-btn typeProduct-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý danh mục sản phẩm</h1>
-        <button className="btn btn-primary" onClick={handleAdd}>
+      <div className="typeProduct-page-header">
+        <h1 className="typeProduct-page-title">Quản lý danh mục sản phẩm</h1>
+        <button className="typeProduct-btn typeProduct-btn-primary" onClick={handleAdd}>
           Thêm danh mục mới
         </button>
       </div>
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="typeProduct-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
           value={searchTerm}
           onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-          className="form-input"
-          style={{ flex: 1 }}
+          className="typeProduct-form-input"
         />
         <select
           value={searchCriteria}
           onChange={(e) => { setSearchCriteria(e.target.value); setCurrentPage(1); }}
-          className="form-input"
-          style={{ width: 'auto' }}
+          className="typeProduct-form-input"
         >
           <option value="all">Tất cả</option>
           <option value="nameType">Tên danh mục</option>
@@ -215,60 +268,60 @@ const Categories = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="typeProduct-modal-overlay">
+          <div className="typeProduct-modal">
             <h2>{formType === 'add' ? 'Thêm danh mục mới' : 'Sửa danh mục'}</h2>
-            <form onSubmit={handleSubmit} className="form">
+            <form onSubmit={handleSubmit} className="typeProduct-form">
               {formType === 'edit' && (
-                <div className="form-group">
-                  <label className="form-label">ID:</label>
+                <div className="typeProduct-form-group">
+                  <label className="typeProduct-form-label">ID:</label>
                   <input
                     type="text"
-                    className="form-input"
+                    className="typeProduct-form-input"
                     value={formData.idType}
                     readOnly
                     style={{ backgroundColor: '#f5f5f5' }}
                   />
                 </div>
               )}
-              <div className="form-group">
-                <label className="form-label">Tên danh mục:</label>
+              <div className="typeProduct-form-group">
+                <label className="typeProduct-form-label">Tên danh mục:</label>
                 <input
                   type="text"
                   name="nameType"
-                  className="form-input"
+                  className="typeProduct-form-input"
                   value={formData.nameType}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Mô tả:</label>
+              <div className="typeProduct-form-group">
+                <label className="typeProduct-form-label">Mô tả:</label>
                 <textarea
                   name="descriptionType"
-                  className="form-input"
+                  className="typeProduct-form-input"
                   value={formData.descriptionType}
                   onChange={handleInputChange}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tồn kho:</label>
+              <div className="typeProduct-form-group">
+                <label className="typeProduct-form-label">Tồn kho:</label>
                 <input
                   type="number"
                   name="inventory"
-                  className="form-input"
+                  className="typeProduct-form-input"
                   value={formData.inventory}
                   onChange={handleInputChange}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Kiểu bán:</label>
+              <div className="typeProduct-form-group">
+                <label className="typeProduct-form-label">Kiểu bán:</label>
                 <select
                   name="typeSell"
-                  className="form-input"
+                  className="typeProduct-form-input"
                   value={formData.typeSell}
                   onChange={handleInputChange}
                   required
@@ -277,9 +330,9 @@ const Categories = () => {
                   <option value="Khối lượng">Khối lượng</option>
                 </select>
               </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Lưu</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+              <div className="typeProduct-form-actions">
+                <button type="submit" className="typeProduct-btn typeProduct-btn-primary">Lưu</button>
+                <button type="button" className="typeProduct-btn typeProduct-btn-secondary" onClick={() => setShowForm(false)}>
                   Hủy
                 </button>
               </div>
@@ -288,8 +341,8 @@ const Categories = () => {
         </div>
       )}
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="typeProduct-table-container">
+        <table className="typeProduct-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -309,10 +362,10 @@ const Categories = () => {
                 <td>{category.inventory}</td>
                 <td>{category.typeSell}</td>
                 <td>
-                  <button className="btn btn-primary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }} onClick={() => handleEdit(category)}>
+                  <button className="typeProduct-btn typeProduct-btn-primary typeProduct-btn-sm" onClick={() => handleEdit(category)}>
                     Sửa
                   </button>
-                  <button className="btn btn-secondary btn-sm action-anim" style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }} onClick={() => handleDelete(category.idType)}>
+                  <button className="typeProduct-btn typeProduct-btn-secondary typeProduct-btn-sm" onClick={() => handleDelete(category.idType)}>
                     Xóa
                   </button>
                 </td>

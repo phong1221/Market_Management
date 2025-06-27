@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 const Header = ({ onSidebarToggle, sidebarOpen }) => {
   const location = useLocation()
@@ -16,17 +17,17 @@ const Header = ({ onSidebarToggle, sidebarOpen }) => {
   }, [open]);
 
   const navItems = [
-    { path: '/', label: 'Trang chủ' },
-    { path: '/users', label: 'Quản lý người dùng' },
-    { path: '/employees', label: 'Quản lý nhân viên' },
-    { path: '/products', label: 'Quản lý sản phẩm' },
-    { path: '/providers', label: 'Quản lý nhà cung cấp' },
-    { path: '/categories', label: 'Danh mục sản phẩm' },
-    { path: '/brands', label: 'Quản lý nhãn hàng' },
-    { path: '/promotions', label: 'Khuyến mãi' },
-    { path: '/imports', label: 'Nhập hàng' },
-    { path: '/salary', label: 'Lương nhân viên' }
-    // { path: '/login', label: 'Đăng nhập' }
+    { path: '/', label: 'Trang chủ', icon: 'fas fa-home' },
+    { path: '/users', label: 'Người dùng', icon: 'fas fa-users' },
+    { path: '/employees', label: 'Nhân viên', icon: 'fas fa-user-tie' },
+    { path: '/products', label: 'Sản phẩm', icon: 'fas fa-box' },
+    { path: '/categories', label: 'Loại sản phẩm', icon: 'fas fa-sitemap' },
+    { path: '/brands', label: 'Nhãn hàng', icon: 'fas fa-tags' },
+    { path: '/providers', label: 'Nhà cung cấp', icon: 'fas fa-parachute-box' },
+    { path: '/imports', label: 'Nhập hàng', icon: 'fas fa-truck-loading' },
+    { path: '/orders', label: 'Đơn hàng', icon: 'fas fa-receipt' },
+    { path: '/promotions', label: 'Khuyến mãi', icon: 'fas fa-percent' },
+    { path: '/salary', label: 'Lương', icon: 'fas fa-dollar-sign' },
   ]
 
   return (
@@ -69,12 +70,14 @@ const Header = ({ onSidebarToggle, sidebarOpen }) => {
           <ul className="sidebar-menu">
             {navItems.map((item) => (
               <li key={item.path}>
-                <Link
+                <NavLink
                   to={item.path}
-                  className={location.pathname === item.path ? 'active' : ''}
+                  className={({ isActive }) => "sidebar-link" + (isActive ? " active" : "")}
+                  end={item.path === '/'} // Important for home link
                 >
-                  {item.label}
-                </Link>
+                  <i className={item.icon}></i>
+                  <span>{item.label}</span>
+                </NavLink>
               </li>
             ))}
           </ul>
