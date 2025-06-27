@@ -145,6 +145,25 @@ const Brands = () => {
     try {
       const result = await deleteBrand(id);
       if (result.success) {
+        // Tính toán số trang mới sau khi xóa dựa trên dữ liệu hiện tại
+        const currentTotalItems = filteredBrands.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
+        const itemsOnCurrentPage = currentBrands.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        // Logic điều hướng trang sau khi xóa:
+        // 1. Nếu trang hiện tại lớn hơn số trang mới và có ít nhất 1 trang, chuyển về trang đầu tiên
+        // 2. Nếu xóa phần tử cuối cùng của trang và không phải trang đầu tiên, chuyển về trang trước
+        // 3. Nếu xóa phần tử cuối cùng của trang đầu tiên và không còn dữ liệu, giữ nguyên trang 1
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchBrands();
         setNotification({ message: "Xóa nhãn hàng thành công!", type: "success" });
       } else {
@@ -184,7 +203,14 @@ const Brands = () => {
 
   const filteredBrands = filterData();
   const totalPages = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentBrands = filteredBrands.slice(startIndex, endIndex);
 
@@ -209,7 +235,7 @@ const Brands = () => {
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+          className={`brands-pagination-button ${currentPage === i ? 'active' : ''}`}
         >
           {i}
         </button>
@@ -217,22 +243,39 @@ const Brands = () => {
     }
 
     return (
-      <div className="pagination">
+      <div className="brands-pagination-container">
+        <button
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === 1}
+          className="brands-pagination-button"
+        >
+          &laquo;
+        </button>
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="pagination-btn"
+          className="brands-pagination-button"
         >
-          Trước
+          &lsaquo;
         </button>
         {pages}
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="pagination-btn"
+          className="brands-pagination-button"
         >
-          Sau
+          &rsaquo;
         </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          className="brands-pagination-button"
+        >
+          &raquo;
+        </button>
+        <span className="brands-pagination-info">
+          Trang {currentPage} / {totalPages}
+        </span>
       </div>
     );
   };
@@ -279,38 +322,38 @@ const Brands = () => {
 
   console.log('filteredBrands:', filteredBrands.length, filteredBrands);
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="brands-loading">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="brands-page">
       {notification && (
         <div className={`notification-container notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="brands-modal-overlay">
+          <div className="brands-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa nhãn hàng này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeleteBrand(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="brands-form-actions">
+              <button className="brands-btn brands-btn-danger" onClick={() => confirmDeleteBrand(confirmDelete)}>Xóa</button>
+              <button className="brands-btn brands-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý nhãn hàng</h1>
+      <div className="brands-page-header">
+        <h1 className="brands-page-title">Quản lý nhãn hàng</h1>
         <button 
-          className="btn btn-primary" 
+          className="brands-btn brands-btn-primary" 
           onClick={handleAdd}
         >
           Thêm nhãn hàng mới
         </button>
       </div>
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="brands-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -319,8 +362,7 @@ const Brands = () => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="modal-input"
-          style={{ flex: 1 }}
+          className="brands-form-input"
         />
         <select
           value={searchCriteria}
@@ -328,8 +370,7 @@ const Brands = () => {
             setSearchCriteria(e.target.value);
             setCurrentPage(1);
           }}
-          className="modal-input"
-          style={{ width: 'auto' }}
+          className="brands-form-input"
         >
           <option value="all">Tất cả</option>
           <option value="nameBrand">Tên nhãn hàng</option>
@@ -338,36 +379,36 @@ const Brands = () => {
       </div>
 
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="brands-modal-overlay">
+          <div className="brands-modal">
             <h2>{modalType === "add" ? "Thêm nhãn hàng mới" : "Sửa nhãn hàng"}</h2>
-            <form onSubmit={handleSave} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleSave} className="brands-form">
+              <div className="brands-form-group">
+                <label className="brands-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="brands-form-input"
                   value={modalType === "add" ? "Tự động tạo" : editingBrand.idBrand}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên nhãn hàng:</label>
+              <div className="brands-form-group">
+                <label className="brands-form-label">Tên nhãn hàng:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="brands-form-input"
                   value={editingBrand.nameBrand}
                   onChange={e => setEditingBrand({ ...editingBrand, nameBrand: e.target.value })}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Logo: <span style={{ color: '#666', fontSize: '12px' }}>(Tùy chọn)</span></label>
+              <div className="brands-form-group">
+                <label className="brands-form-label">Logo: <span style={{ color: '#666', fontSize: '12px' }}>(Tùy chọn)</span></label>
                 <input
                   type="file"
-                  className="form-input"
+                  className="brands-form-input"
                   accept="image/*"
                   onChange={handleLogoUpload}
                 />
@@ -390,17 +431,17 @@ const Brands = () => {
                 )}
               </div>
               
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
+              <div className="brands-form-actions">
+                <button type="submit" className="brands-btn brands-btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
+                <button type="button" className="brands-btn brands-btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="brands-table-container">
+        <table className="brands-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -419,14 +460,13 @@ const Brands = () => {
                 <td>{brand.nameBrand}</td>
                 <td>
                   <button 
-                    className="btn btn-secondary btn-sm"
+                    className="brands-btn brands-btn-secondary brands-btn-sm"
                     onClick={() => handleDelete(brand.idBrand)}
                   >
                     Xóa
                   </button>
                   <button
-                    className="btn btn-primary btn-sm"
-                    style={{ marginLeft: 8 }}
+                    className="brands-btn brands-btn-primary brands-btn-sm"
                     onClick={() => handleEdit(brand)}
                   >
                     Sửa

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { fetchPromotion, addPromotion, updatePromotion, deletePromotion, hidePromotion } from '../../services/promotionService';
+import '../../css/promotion.css';
 import '../../css/notification.css';
 
 const Promotions = () => {
@@ -137,6 +138,22 @@ const Promotions = () => {
     try {
       const success = await deletePromotion(id)
       if (success) {
+        // Tính toán số trang mới sau khi xóa dựa trên dữ liệu hiện tại
+        const currentTotalItems = filteredPromotions.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
+        const itemsOnCurrentPage = currentPromotions.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        // Logic điều hướng trang sau khi xóa
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchPromotions()
         setNotification({ message: 'Xóa khuyến mãi thành công', type: 'success' })
       } else {
@@ -210,7 +227,14 @@ const Promotions = () => {
 
   const filteredPromotions = filterData()
   const totalPages = Math.ceil(filteredPromotions.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentPromotions = filteredPromotions.slice(startIndex, endIndex)
 
@@ -231,7 +255,7 @@ const Promotions = () => {
       pages.push(
         <button
           key={i}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          className={`promotions-pagination-button ${currentPage === i ? 'active' : ''}`}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -239,16 +263,16 @@ const Promotions = () => {
       )
     }
     return (
-      <div className="pagination-container">
+      <div className="promotions-pagination-container">
         <button
-          className="pagination-button"
+          className="promotions-pagination-button"
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
         >
           &laquo;
         </button>
         <button
-          className="pagination-button"
+          className="promotions-pagination-button"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -256,58 +280,58 @@ const Promotions = () => {
         </button>
         {pages}
         <button
-          className="pagination-button"
+          className="promotions-pagination-button"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           &rsaquo;
         </button>
         <button
-          className="pagination-button"
+          className="promotions-pagination-button"
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
         >
           &raquo;
         </button>
-        <span className="pagination-info">
+        <span className="promotions-pagination-info">
           Trang {currentPage} / {totalPages}
         </span>
       </div>
     )
   }
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="promotions-loading">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="promotions-page">
       {notification && (
         <div className={`notification-container notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="promotions-modal-overlay">
+          <div className="promotions-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa khuyến mãi này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeletePromotion(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="promotions-form-actions">
+              <button className="promotions-btn promotions-btn-danger" onClick={() => confirmDeletePromotion(confirmDelete)}>Xóa</button>
+              <button className="promotions-btn promotions-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý khuyến mãi</h1>
+      <div className="promotions-page-header">
+        <h1 className="promotions-page-title">Quản lý khuyến mãi</h1>
         <button 
-          className="btn btn-primary" 
+          className="promotions-btn promotions-btn-primary" 
           onClick={handleAdd}
         >
           Thêm khuyến mãi mới
         </button>
       </div>
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="promotions-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -316,8 +340,7 @@ const Promotions = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ flex: 1 }}
+          className="promotions-form-input"
         />
         <select
           value={searchCriteria}
@@ -325,8 +348,7 @@ const Promotions = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ width: 'auto' }}
+          className="promotions-form-input"
         >
           <option value="all">Tất cả</option>
           <option value="namePromotion">Tên khuyến mãi</option>
@@ -336,35 +358,35 @@ const Promotions = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="promotions-modal-overlay">
+          <div className="promotions-modal">
             <h2>{formType === 'add' ? 'Thêm khuyến mãi mới' : 'Sửa khuyến mãi'}</h2>
-            <form onSubmit={handleSubmit} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleSubmit} className="promotions-form">
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.idPromotion}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên khuyến mãi:</label>
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">Tên khuyến mãi:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.namePromotion}
                   onChange={(e) => setFormData({...formData, namePromotion: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Mô tả:</label>
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">Mô tả:</label>
                 <textarea
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.descriptionPromotion}
                   onChange={(e) => setFormData({...formData, descriptionPromotion: e.target.value})}
                   required
@@ -372,11 +394,11 @@ const Promotions = () => {
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Phần trăm giảm giá (%):</label>
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">Phần trăm giảm giá (%):</label>
                 <input
                   type="number"
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.discountPromotion}
                   onChange={(e) => setFormData({...formData, discountPromotion: e.target.value})}
                   min="0"
@@ -386,11 +408,11 @@ const Promotions = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Ngày bắt đầu:</label>
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">Ngày bắt đầu:</label>
                 <input
                   type="date"
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.startDay}
                   onChange={(e) => {
                     const newStartDay = e.target.value
@@ -401,11 +423,11 @@ const Promotions = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Ngày kết thúc:</label>
+              <div className="promotions-form-group">
+                <label className="promotions-form-label">Ngày kết thúc:</label>
                 <input
                   type="date"
-                  className="form-input"
+                  className="promotions-form-input"
                   value={formData.endDay}
                   onChange={(e) => {
                     const newEndDay = e.target.value
@@ -417,18 +439,18 @@ const Promotions = () => {
               </div>
               
               {dateError && (
-                <div className="form-group">
-                  <div className="error-message" style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>
+                <div className="promotions-form-group">
+                  <div className="promotions-error-message">
                     ⚠️ {dateError}
                   </div>
                 </div>
               )}
 
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
+              <div className="promotions-form-actions">
+                <button type="submit" className="promotions-btn promotions-btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="promotions-btn promotions-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
                   Hủy
@@ -439,8 +461,8 @@ const Promotions = () => {
         </div>
       )}
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="promotions-table-container">
+        <table className="promotions-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -463,28 +485,25 @@ const Promotions = () => {
                 <td>{promotion.startDay}</td>
                 <td>{promotion.endDay}</td>
                 <td>
-                  <span className={`status-badge ${promotion.status === 'Active' || promotion.status === 'Hoạt động' ? 'active' : 'inactive'}`}>
+                  <span className={`promotions-status-badge ${promotion.status === 'Active' || promotion.status === 'Hoạt động' ? 'active' : 'inactive'}`}>
                     {promotion.status === 'Active' || promotion.status === 'Hoạt động' ? 'Hoạt động' : 'Không hoạt động'}
                   </span>
                 </td>
                 <td>
                   <button 
-                    className="btn btn-primary btn-sm action-anim"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
+                    className="promotions-btn promotions-btn-primary promotions-btn-sm"
                     onClick={() => handleEdit(promotion)}
                   >
                     Sửa
                   </button>
                   <button 
-                    className="btn btn-info btn-sm action-anim"
-                    style={{ minWidth: 60, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
+                    className="promotions-btn promotions-btn-info promotions-btn-sm"
                     onClick={() => handleHide(promotion.idPromotion)}
                   >
                     {promotion.status === 'Active' || promotion.status === 'Hoạt động' ? 'Ẩn' : 'Hiện'}
                   </button>
                   <button 
-                    className="btn btn-secondary btn-sm action-anim"
-                    style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
+                    className="promotions-btn promotions-btn-secondary promotions-btn-sm"
                     onClick={() => handleDelete(promotion.idPromotion)}
                   >
                     Xóa

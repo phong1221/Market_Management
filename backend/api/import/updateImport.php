@@ -69,13 +69,34 @@ try {
     }
     
     // 2. Xóa tất cả chi tiết cũ
-    $deleteDetailSql = "DELETE FROM import_detail WHERE idImport = ?";
-    $deleteDetailStmt = $conn->prepare($deleteDetailSql);
-    $deleteDetailStmt->bind_param("i", $data['idImport']);
-    
-    if (!$deleteDetailStmt->execute()) {
-        throw new Exception("Lỗi khi xóa chi tiết cũ: " . $deleteDetailStmt->error);
+    // 2.1. Trước khi xóa chi tiết cũ, trừ số lượng khỏi sản phẩm
+    $selectOldDetailsSql = "SELECT idProduct, quantity FROM import_detail WHERE idImport = ?";
+    $selectOldDetailsStmt = $conn->prepare($selectOldDetailsSql);
+    $selectOldDetailsStmt->bind_param("i", $data['idImport']);
+    $selectOldDetailsStmt->execute();
+    $oldDetailsResult = $selectOldDetailsStmt->get_result();
+    while ($row = $oldDetailsResult->fetch_assoc()) {
+        $updateProductSql = "UPDATE product SET amountProduct = amountProduct - ? WHERE idProduct = ?";
+        $updateProductStmt = $conn->prepare($updateProductSql);
+        $updateProductStmt->bind_param("di", $row['quantity'], $row['idProduct']);
+        if (!$updateProductStmt->execute()) {
+            throw new Exception("Lỗi khi cập nhật số lượng sản phẩm cũ: " . $updateProductStmt->error);
+        }
+        $updateProductStmt->close();
+
+        // Lấy idType của sản phẩm để cập nhật tồn kho danh mục
+        $getTypeSql = "SELECT idType FROM product WHERE idProduct = ?";
+        $getTypeStmt = $conn->prepare($getTypeSql);
+        $getTypeStmt->bind_param("i", $row['idProduct']);
+        $getTypeStmt->execute();
+        $getTypeResult = $getTypeStmt->get_result();
+        if ($rowType = $getTypeResult->fetch_assoc()) {
+            require_once '../typeProduct/updateInventory.php';
+            updateInventory($conn, $rowType['idType']);
+        }
+        $getTypeStmt->close();
     }
+    $selectOldDetailsStmt->close();
     
     // 3. Thêm chi tiết sản phẩm mới
     $detailSql = "INSERT INTO import_detail (idImport, idProduct, quantity, importPrice, exportPrice, totalPrice, notes) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -108,6 +129,27 @@ try {
         if (!$detailStmt->execute()) {
             throw new Exception("Lỗi khi thêm chi tiết sản phẩm: " . $detailStmt->error);
         }
+        
+        // Sau khi thêm chi tiết mới, cộng số lượng vào sản phẩm
+        $updateProductSql = "UPDATE product SET amountProduct = amountProduct + ? WHERE idProduct = ?";
+        $updateProductStmt = $conn->prepare($updateProductSql);
+        $updateProductStmt->bind_param("di", $item['quantity'], $item['idProduct']);
+        if (!$updateProductStmt->execute()) {
+            throw new Exception("Lỗi khi cập nhật số lượng sản phẩm mới: " . $updateProductStmt->error);
+        }
+        $updateProductStmt->close();
+
+        // Lấy idType của sản phẩm để cập nhật tồn kho danh mục
+        $getTypeSql = "SELECT idType FROM product WHERE idProduct = ?";
+        $getTypeStmt = $conn->prepare($getTypeSql);
+        $getTypeStmt->bind_param("i", $item['idProduct']);
+        $getTypeStmt->execute();
+        $getTypeResult = $getTypeStmt->get_result();
+        if ($rowType = $getTypeResult->fetch_assoc()) {
+            require_once '../typeProduct/updateInventory.php';
+            updateInventory($conn, $rowType['idType']);
+        }
+        $getTypeStmt->close();
     }
     
     // 4. Cập nhật tổng tiền import
@@ -139,7 +181,6 @@ try {
 } finally {
     // Đóng các statement
     if (isset($importStmt)) $importStmt->close();
-    if (isset($deleteDetailStmt)) $deleteDetailStmt->close();
     if (isset($detailStmt)) $detailStmt->close();
     if (isset($updateStmt)) $updateStmt->close();
     

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { fetchProvider, addProvider, updateProvider, deleteProvider } from '../../services/providerService';
 import { fetchTypeProduct } from '../../services/typeProductService';
 import '../../css/notification.css';
+import '../../css/provider.css';
 
 const Providers = () => {
   const [providers, setProviders] = useState([])
@@ -138,6 +139,22 @@ const Providers = () => {
     try {
       const success = await deleteProvider(id)
       if (success) {
+        // Tính toán số trang mới sau khi xóa dựa trên dữ liệu hiện tại
+        const currentTotalItems = filteredProviders.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
+        const itemsOnCurrentPage = currentProviders.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        // Logic điều hướng trang sau khi xóa
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchProviders()
         setNotification({ message: 'Xóa nhà cung cấp thành công', type: 'success' })
       } else {
@@ -186,7 +203,14 @@ const Providers = () => {
 
   const filteredProviders = filterData()
   const totalPages = Math.ceil(filteredProviders.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentProviders = filteredProviders.slice(startIndex, endIndex)
 
@@ -207,7 +231,7 @@ const Providers = () => {
       pages.push(
         <button
           key={i}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          className={`providers-pagination-button ${currentPage === i ? 'active' : ''}`}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -215,16 +239,16 @@ const Providers = () => {
       )
     }
     return (
-      <div className="pagination-container">
+      <div className="providers-pagination-container">
         <button
-          className="pagination-button"
+          className="providers-pagination-button"
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
         >
           &laquo;
         </button>
         <button
-          className="pagination-button"
+          className="providers-pagination-button"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -232,58 +256,58 @@ const Providers = () => {
         </button>
         {pages}
         <button
-          className="pagination-button"
+          className="providers-pagination-button"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           &rsaquo;
         </button>
         <button
-          className="pagination-button"
+          className="providers-pagination-button"
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
         >
           &raquo;
         </button>
-        <span className="pagination-info">
+        <span className="providers-pagination-info">
           Trang {currentPage} / {totalPages}
         </span>
       </div>
     )
   }
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="providers-page">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="providers-page">
       {notification && (
         <div className={`notification-container notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="providers-modal-overlay">
+          <div className="providers-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa nhà cung cấp này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeleteProvider(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="providers-form-actions">
+              <button className="providers-btn providers-btn-danger" onClick={() => confirmDeleteProvider(confirmDelete)}>Xóa</button>
+              <button className="providers-btn providers-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý nhà cung cấp</h1>
+      <div className="providers-page-header">
+        <h1 className="providers-page-title">Quản lý nhà cung cấp</h1>
         <button 
-          className="btn btn-primary" 
+          className="providers-btn providers-btn-primary" 
           onClick={handleAdd}
         >
           Thêm nhà cung cấp mới
         </button>
       </div>
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="providers-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -292,8 +316,7 @@ const Providers = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ flex: 1 }}
+          className="providers-form-input"
         />
         <select
           value={searchCriteria}
@@ -301,8 +324,7 @@ const Providers = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ width: 'auto' }}
+          className="providers-form-input"
         >
           <option value="all">Tất cả</option>
           <option value="nameProvider">Tên nhà cung cấp</option>
@@ -314,69 +336,69 @@ const Providers = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="providers-modal-overlay">
+          <div className="providers-modal">
             <h2>{formType === 'add' ? 'Thêm nhà cung cấp mới' : 'Sửa nhà cung cấp'}</h2>
-            <form onSubmit={handleSubmit} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleSubmit} className="providers-form">
+              <div className="providers-form-group">
+                <label className="providers-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="providers-form-input"
                   value={formData.idProvider}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên nhà cung cấp:</label>
+              <div className="providers-form-group">
+                <label className="providers-form-label">Tên nhà cung cấp:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="providers-form-input"
                   value={formData.nameProvider}
                   onChange={(e) => setFormData({...formData, nameProvider: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Địa chỉ:</label>
+              <div className="providers-form-group">
+                <label className="providers-form-label">Địa chỉ:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="providers-form-input"
                   value={formData.addressProvider}
                   onChange={(e) => setFormData({...formData, addressProvider: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Số điện thoại:</label>
+              <div className="providers-form-group">
+                <label className="providers-form-label">Số điện thoại:</label>
                 <input
                   type="tel"
-                  className="form-input"
+                  className="providers-form-input"
                   value={formData.phoneProvider}
                   onChange={(e) => setFormData({...formData, phoneProvider: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Email:</label>
+              <div className="providers-form-group">
+                <label className="providers-form-label">Email:</label>
                 <input
                   type="email"
-                  className="form-input"
+                  className="providers-form-input"
                   value={formData.emailProvider}
                   onChange={(e) => setFormData({...formData, emailProvider: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Loại sản phẩm:</label>
+              <div className="providers-form-group">
+                <label className="providers-form-label">Loại sản phẩm:</label>
                 <select
                   value={formData.idType || ''}
                   onChange={(e) => {
                     console.log("Selected idType:", e.target.value);
                     setFormData({...formData, idType: e.target.value});
                   }}
-                  className="form-input"
+                  className="providers-form-input"
                   required
                 >
                   <option value="">Chọn loại sản phẩm</option>
@@ -390,11 +412,11 @@ const Providers = () => {
                   })}
                 </select>
               </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
+              <div className="providers-form-actions">
+                <button type="submit" className="providers-btn providers-btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="providers-btn providers-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
                   Hủy
@@ -405,8 +427,8 @@ const Providers = () => {
         </div>
       )}
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="providers-table-container">
+        <table className="providers-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -431,15 +453,13 @@ const Providers = () => {
                   <td>{provider.nameType || `Chưa phân loại (idType: ${provider.idType})`}</td>
                   <td>
                     <button 
-                      className="btn btn-primary btn-sm action-anim"
-                      style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
+                      className="providers-btn providers-btn-primary providers-btn-sm"
                       onClick={() => handleEdit(provider)}
                     >
                       Sửa
                     </button>
                     <button 
-                      className="btn btn-secondary btn-sm action-anim"
-                      style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
+                      className="providers-btn providers-btn-secondary providers-btn-sm"
                       onClick={() => handleDelete(provider.idProvider)}
                     >
                       Xóa

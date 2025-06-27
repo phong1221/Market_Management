@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import '../../css/user.css'
 import '../../css/notification.css'
-import { fetchUser, addUser, updateUser, deleteUser } from '../../services/userService';
+import { fetchUser, addUser, updateUser, deleteUser, fetchUserDetails } from '../../services/userService';
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -28,6 +28,7 @@ const Users = () => {
   const [searchCriteria, setSearchCriteria] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const ITEMS_PER_PAGE = 5
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
     fetchUsers()
@@ -112,6 +113,22 @@ const Users = () => {
     try {
       const success = await deleteUser(id)
       if (success) {
+        // Tính toán số trang mới sau khi xóa dựa trên dữ liệu hiện tại
+        const currentTotalItems = filteredUsers.length;
+        const newTotalItems = currentTotalItems - 1;
+        const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
+        
+        // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
+        const itemsOnCurrentPage = currentUsers.length;
+        const isLastItemOnPage = itemsOnCurrentPage === 1;
+        
+        // Logic điều hướng trang sau khi xóa
+        if (currentPage > newTotalPages && newTotalPages > 0) {
+          setCurrentPage(1);
+        } else if (isLastItemOnPage && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+        
         fetchUsers()
         setNotification({ message: 'Xóa người dùng thành công', type: 'success' })
       } else {
@@ -128,10 +145,23 @@ const Users = () => {
     setConfirmDelete(null)
   }
 
-  const handleViewDetail = (user) => {
-    setSelectedUser(user)
-    setShowDetail(true)
-  }
+  const handleViewDetail = async (user) => {
+    setShowDetail(true);
+    setLoadingDetails(true);
+    setSelectedUser(user); // Hiển thị thông tin cơ bản ngay lập tức
+
+    try {
+      const details = await fetchUserDetails(user.idUser);
+      // Hợp nhất thông tin chi tiết vào user đã chọn
+      if (details) {
+        setSelectedUser(prevUser => ({ ...prevUser, ...details }));
+      }
+    } catch (error) {
+      setNotification({ message: 'Lỗi khi tải chi tiết người dùng.', type: 'error' });
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
 
   const handleEditClick = (user) => {
     setEditData({
@@ -166,7 +196,14 @@ const Users = () => {
 
   const filteredUsers = filterData()
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  
+  // Đảm bảo currentPage không vượt quá totalPages
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage) {
+    setCurrentPage(validCurrentPage);
+  }
+  
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentUsers = filteredUsers.slice(startIndex, endIndex)
 
@@ -187,7 +224,7 @@ const Users = () => {
       pages.push(
         <button
           key={i}
-          className={`pagination-button ${currentPage === i ? 'active' : ''}`}
+          className={`users-pagination-button ${currentPage === i ? 'active' : ''}`}
           onClick={() => handlePageChange(i)}
         >
           {i}
@@ -195,16 +232,16 @@ const Users = () => {
       )
     }
     return (
-      <div className="pagination-container">
+      <div className="users-pagination-container">
         <button
-          className="pagination-button"
+          className="users-pagination-button"
           onClick={() => handlePageChange(1)}
           disabled={currentPage === 1}
         >
           &laquo;
         </button>
         <button
-          className="pagination-button"
+          className="users-pagination-button"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
@@ -212,51 +249,51 @@ const Users = () => {
         </button>
         {pages}
         <button
-          className="pagination-button"
+          className="users-pagination-button"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
           &rsaquo;
         </button>
         <button
-          className="pagination-button"
+          className="users-pagination-button"
           onClick={() => handlePageChange(totalPages)}
           disabled={currentPage === totalPages}
         >
           &raquo;
         </button>
-        <span className="pagination-info">
+        <span className="users-pagination-info">
           Trang {currentPage} / {totalPages}
         </span>
       </div>
     )
   }
 
-  if (loading) return <div className="page">Đang tải...</div>
+  if (loading) return <div className="users-loading">Đang tải...</div>
 
   return (
-    <div className="page">
+    <div className="users-page">
       {notification && (
         <div className={`notification-container notification-${notification.type}`}>
           {notification.message}
         </div>
       )}
       {confirmDelete && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="users-modal-overlay">
+          <div className="users-modal">
             <h2>Xác nhận xóa</h2>
             <p>Bạn có chắc chắn muốn xóa người dùng này?</p>
-            <div className="form-actions">
-              <button className="btn btn-danger" onClick={() => confirmDeleteUser(confirmDelete)}>Xóa</button>
-              <button className="btn btn-secondary" onClick={cancelDelete}>Hủy</button>
+            <div className="users-form-actions">
+              <button className="users-btn users-btn-danger" onClick={() => confirmDeleteUser(confirmDelete)}>Xóa</button>
+              <button className="users-btn users-btn-secondary" onClick={cancelDelete}>Hủy</button>
             </div>
           </div>
         </div>
       )}
-      <div className="page-header">
-        <h1 className="page-title">Quản lý người dùng</h1>
+      <div className="users-page-header">
+        <h1 className="users-page-title">Quản lý người dùng</h1>
         <button 
-          className="btn btn-primary" 
+          className="users-btn users-btn-primary" 
           onClick={() => setShowForm(true)}
         >
           Thêm người dùng mới
@@ -264,46 +301,46 @@ const Users = () => {
       </div>
 
       {showForm && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="users-modal-overlay">
+          <div className="users-modal">
             <h2>Thêm người dùng mới</h2>
-            <form onSubmit={handleSubmit} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleSubmit} className="users-form">
+              <div className="users-form-group">
+                <label className="users-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="users-form-input"
                   value={formData.idUser}
                   readOnly
                   style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên đăng nhập:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Tên đăng nhập:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="users-form-input"
                   value={formData.nameUser}
                   onChange={(e) => setFormData({...formData, nameUser: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Mật khẩu:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Mật khẩu:</label>
                 <input
                   type="password"
-                  className="form-input"
+                  className="users-form-input"
                   value={formData.passWord}
                   onChange={(e) => setFormData({...formData, passWord: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
-                <label className="form-label">Vai trò:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Vai trò:</label>
                 <select
-                  className="form-input"
+                  className="users-form-input"
                   value={formData.roleUser}
                   onChange={(e) => setFormData({...formData, roleUser: e.target.value})}
                 >
@@ -316,11 +353,11 @@ const Users = () => {
                 </select>
               </div>
               
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Lưu</button>
+              <div className="users-form-actions">
+                <button type="submit" className="users-btn users-btn-primary">Lưu</button>
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="users-btn users-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
                   Hủy
@@ -332,43 +369,43 @@ const Users = () => {
       )}
 
       {showEdit && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="users-modal-overlay">
+          <div className="users-modal">
             <h2>Sửa người dùng</h2>
-            <form onSubmit={handleEdit} className="form">
-              <div className="form-group">
-                <label className="form-label">ID:</label>
+            <form onSubmit={handleEdit} className="users-form">
+              <div className="users-form-group">
+                <label className="users-form-label">ID:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="users-form-input"
                   value={editData.idUser}
                   disabled
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Tên đăng nhập:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Tên đăng nhập:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="users-form-input"
                   value={editData.nameUser}
                   onChange={(e) => setEditData({...editData, nameUser: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Mật khẩu:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Mật khẩu:</label>
                 <input
                   type="text"
-                  className="form-input"
+                  className="users-form-input"
                   value={editData.passWord}
                   onChange={(e) => setEditData({...editData, passWord: e.target.value})}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Vai trò:</label>
+              <div className="users-form-group">
+                <label className="users-form-label">Vai trò:</label>
                 <select
-                  className="form-input"
+                  className="users-form-input"
                   value={editData.roleUser}
                   onChange={(e) => setEditData({...editData, roleUser: e.target.value})}
                 >
@@ -380,11 +417,11 @@ const Users = () => {
                   <option value="Accountant">Accountant</option>
                 </select>
               </div>
-              <div className="form-actions">
-                <button type="submit" className="btn btn-primary">Cập nhật</button>
+              <div className="users-form-actions">
+                <button type="submit" className="users-btn users-btn-primary">Cập nhật</button>
                 <button 
                   type="button" 
-                  className="btn btn-secondary"
+                  className="users-btn users-btn-secondary"
                   onClick={() => setShowEdit(false)}
                 >
                   Hủy
@@ -396,47 +433,55 @@ const Users = () => {
       )}
 
       {showDetail && selectedUser && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="users-modal-overlay">
+          <div className="users-modal">
             <h2>Chi tiết người dùng</h2>
-            <div className="user-detail">
-              <div className="detail-group">
-                <label className="detail-label">ID:</label>
-                <span className="detail-value">{selectedUser.idUser}</span>
+            <div className="users-user-detail">
+              <div className="users-detail-group">
+                <label className="users-detail-label">ID:</label>
+                <span className="users-detail-value">{selectedUser.idUser}</span>
               </div>
-              <div className="detail-group">
-                <label className="detail-label">Tên đăng nhập:</label>
-                <span className="detail-value">{selectedUser.nameUser}</span>
+              <div className="users-detail-group">
+                <label className="users-detail-label">Tên đăng nhập:</label>
+                <span className="users-detail-value">{selectedUser.nameUser}</span>
               </div>
-              <div className="detail-group">
-                <label className="detail-label">Mật khẩu:</label>
-                <span className="detail-value">{selectedUser.passWord}</span>
+              <div className="users-detail-group">
+                <label className="users-detail-label">Mật khẩu:</label>
+                <span className="users-detail-value">{selectedUser.passWord}</span>
               </div>
-              <div className="detail-group">
-                <label className="detail-label">Vai trò:</label>
-                <span className="detail-value">{selectedUser.roleUser}</span>
+              <div className="users-detail-group">
+                <label className="users-detail-label">Vai trò:</label>
+                <span className="users-detail-value">{selectedUser.roleUser}</span>
               </div>
-              <div className="detail-group">
-                <label className="detail-label">Họ tên đầy đủ:</label>
-                <span className="detail-value">{selectedUser.fullName || 'Chưa cập nhật'}</span>
-              </div>
-              <div className="detail-group">
-                <label className="detail-label">Tuổi:</label>
-                <span className="detail-value">{selectedUser.age || 'Chưa cập nhật'}</span>
-              </div>
-              <div className="detail-group">
-                <label className="detail-label">Địa chỉ:</label>
-                <span className="detail-value">{selectedUser.address || 'Chưa cập nhật'}</span>
-              </div>
-              <div className="detail-group">
-                <label className="detail-label">Số điện thoại:</label>
-                <span className="detail-value">{selectedUser.phone || 'Chưa cập nhật'}</span>
-              </div>
+              {loadingDetails ? (
+                <div className="users-detail-group">
+                  <span>Đang tải thông tin chi tiết...</span>
+                </div>
+              ) : (
+                <>
+                  <div className="users-detail-group">
+                    <label className="users-detail-label">Họ tên đầy đủ:</label>
+                    <span className="users-detail-value">{selectedUser.fullName || 'Chưa cập nhật'}</span>
+                  </div>
+                  <div className="users-detail-group">
+                    <label className="users-detail-label">Tuổi:</label>
+                    <span className="users-detail-value">{selectedUser.age || 'Chưa cập nhật'}</span>
+                  </div>
+                  <div className="users-detail-group">
+                    <label className="users-detail-label">Địa chỉ:</label>
+                    <span className="users-detail-value">{selectedUser.address || 'Chưa cập nhật'}</span>
+                  </div>
+                  <div className="users-detail-group">
+                    <label className="users-detail-label">Số điện thoại:</label>
+                    <span className="users-detail-value">{selectedUser.phone || 'Chưa cập nhật'}</span>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="form-actions">
+            <div className="users-form-actions">
               <button 
                 type="button" 
-                className="btn btn-secondary"
+                className="users-btn users-btn-secondary"
                 onClick={() => setShowDetail(false)}
               >
                 Đóng
@@ -473,8 +518,8 @@ const Users = () => {
         </select>
       </div>
 
-      <div className="table-container">
-        <table className="data-table">
+      <div className="users-table-container">
+        <table className="users-data-table">
           <thead>
             <tr>
               <th>ID</th>
@@ -493,21 +538,21 @@ const Users = () => {
                 <td>{user.roleUser}</td>
                 <td>
                   <button 
-                    className="btn btn-info btn-sm action-anim"
+                    className="users-btn users-btn-info users-btn-sm action-anim"
                     style={{ minWidth: 60, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleViewDetail(user)}
                   >
                     Chi tiết
                   </button>
                   <button 
-                    className="btn btn-primary btn-sm action-anim"
+                    className="users-btn users-btn-primary users-btn-sm action-anim"
                     style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleEditClick(user)}
                   >
                     Sửa
                   </button>
                   <button 
-                    className="btn btn-secondary btn-sm action-anim"
+                    className="users-btn users-btn-secondary users-btn-sm action-anim"
                     style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(user.idUser)}
                   >
