@@ -6,24 +6,26 @@ import Product from '../models/product';
 
 export async function fetchProduct() {
     try {
+        console.log('=== FETCH PRODUCT DEBUG ===');
+        console.log('Calling API URL:', API_URL);
+        
         const response = await fetch(API_URL);
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        
         const data = await response.json();
         console.log("API response:", data);
-        return (data.data || []).map(item => new Product(
-            item.idProduct,
-            item.nameProduct,
-            item.picture,
-            item.descriptionProduct,
-            item.idProvider,
-            item.amountProduct,
-            item.idType,
-            item.importCost,
-            item.exportCost,
-            item.idPromotion,
-            item.idBrand
-        ));
+        console.log("API response.success:", data.success);
+        console.log("API response.data:", data.data);
+        console.log("API response.data length:", data.data ? data.data.length : 'no data');
+        
+        // Trả về dữ liệu gốc từ API thay vì tạo object Product
+        const result = data.data || [];
+        console.log("Returning result:", result);
+        return result;
     } catch (error) {
         console.error("Lỗi khi gọi API:", error);
+        console.error("Error details:", error.message);
         return [];
     }
 }

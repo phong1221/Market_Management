@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import './App.css'
 
 // Components
 import Header from './components/Header.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 // Pages
 import Home from './pages/Admin/Home.jsx'
@@ -20,29 +21,72 @@ import Login from './pages/Admin/Login.jsx'
 import Orders from './pages/Admin/Order'
 // import AccountInfo from './pages/Admin/AccountInfo.jsx' 
 
+// User Components
+import UserHeader from './pages/User/components/Header.jsx'
+import UserFooter from './pages/User/components/Footer.jsx'
+import UserHome from './pages/User/components/Home.jsx'
+import "./pages/User/css/header.css";
+import "./pages/User/css/footer.css";
+import "./pages/User/css/home.css";
+import Groceries from './pages/User/pages/Groceries';
+import Produce from './pages/User/pages/Produce';
+import Household from './pages/User/pages/Household';
+import Organic from './pages/User/pages/Organic';
+
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+  const role = localStorage.getItem('role') // 'admin' hoặc 'user'
+  const location = useLocation();
+
+  // Xác định có phải giao diện user không
+  const isUserPage = location.pathname.startsWith('/user')
+  // Chỉ render sidebar nếu đã đăng nhập, KHÔNG ở trang login, và là admin
+  const showSidebar = isLoggedIn && location.pathname !== '/admin/login' && !isUserPage;
 
   return (
     <div className="App">
-      <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />
-      <main className="main-content">
+      {/* Header cho admin */}
+      {showSidebar && <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />}
+      {/* Header cho user */}
+      {isUserPage && <UserHeader />}
+      <main className={`main-content${isUserPage ? ' user-main' : ''} ${!showSidebar && !isUserPage ? 'no-header' : ''}`}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/providers" element={<Providers />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/promotions" element={<Promotions />} />
-          <Route path="/imports" element={<Imports />} />
-          <Route path="/salary" element={<Salary />} />
-          <Route path="/brands" element={<Brands />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/orders" element={<Orders />} />
-          {/* <Route path="/account-info" element={<AccountInfo />} /> */}
+          {/* Public routes */}
+          <Route path="/admin/login" element={<Login />} />
+          {/* Protected admin routes */}
+          <Route path="/admin" element={<ProtectedRoute><Navigate to="/admin/home" replace /></ProtectedRoute>} />
+          <Route path="/admin/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+          <Route path="/admin/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+          <Route path="/admin/providers" element={<ProtectedRoute><Providers /></ProtectedRoute>} />
+          <Route path="/admin/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
+          <Route path="/admin/promotions" element={<ProtectedRoute><Promotions /></ProtectedRoute>} />
+          <Route path="/admin/imports" element={<ProtectedRoute><Imports /></ProtectedRoute>} />
+          <Route path="/admin/salary" element={<ProtectedRoute><Salary /></ProtectedRoute>} />
+          <Route path="/admin/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          {/* User routes */}
+          <Route path="/user/home/:category" element={<UserHome />} />
+          <Route path="/user/home" element={<UserHome />} />
+          <Route path="/user/groceries" element={<Groceries />} />
+          <Route path="/user/produce" element={<Produce />} />
+          <Route path="/user/household" element={<Household />} />
+          <Route path="/user/organic" element={<Organic />} />
+          {/* Có thể thêm các route user khác ở đây */}
+          {/* Redirect root: nếu đã đăng nhập, chuyển theo role; nếu chưa, về login */}
+          <Route path="/" element={
+            isLoggedIn
+              ? (role === 'admin' ? <Navigate to="/admin/home" replace /> : <Navigate to="/user/home" replace />)
+              : <Navigate to="/admin/login" replace />
+          } />
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      {/* Footer cho user */}
+      {isUserPage && <UserFooter />}
     </div>
   )
 }
