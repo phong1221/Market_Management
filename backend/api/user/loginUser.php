@@ -31,8 +31,8 @@ function loginUser() {
         $username = $conn->real_escape_string($data['nameUser']);
         $password = $conn->real_escape_string($data['passWord']);
         
-        // Kiểm tra tài khoản admin trong bảng useraccount
-        $query = "SELECT * FROM useraccount WHERE nameUser = '$username' AND passWord = '$password' AND roleUser = 'Admin' LIMIT 1";
+        // Kiểm tra tài khoản trong bảng useraccount (không chỉ Admin)
+        $query = "SELECT * FROM useraccount WHERE nameUser = '$username' AND passWord = '$password' LIMIT 1";
         $result = $conn->query($query);
         
         if ($result && $result->num_rows > 0) {

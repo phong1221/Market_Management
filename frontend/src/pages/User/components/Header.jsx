@@ -68,7 +68,7 @@ const Header = () => {
               }}
               onClick={() => setShowLogin(false)}
             >×</button>
-            <Login />
+            <Login isModal={true} />
           </div>
         </div>
       )}

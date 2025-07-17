@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const Login = () => {
+const Login = ({ isModal = false }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
@@ -23,11 +25,13 @@ const Login = () => {
   const [showForm, setShowForm] = useState(true);
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    if (user) {
-      navigate('/user/home');
+    if (!isModal) {
+      const user = localStorage.getItem('user');
+      if (user) {
+        navigate('/user/home');
+      }
     }
-  }, [navigate]);
+  }, [navigate, isModal]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,28 +50,38 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
+    let hasError = false;
 
     if (!formData.nameUser.trim()) {
       newErrors.nameUser = 'Tên đăng nhập là bắt buộc';
+      hasError = true;
     } else if (formData.nameUser.length < 3) {
       newErrors.nameUser = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+      hasError = true;
     }
 
     if (!formData.passWord) {
       newErrors.passWord = 'Mật khẩu là bắt buộc';
+      hasError = true;
     } else if (formData.passWord.length < 6) {
       newErrors.passWord = 'Mật khẩu phải có ít nhất 6 ký tự';
+      hasError = true;
     }
 
     if (!isLogin) {
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Xác nhận mật khẩu là bắt buộc';
+        hasError = true;
       } else if (formData.passWord !== formData.confirmPassword) {
         newErrors.confirmPassword = 'Mật khẩu không khớp';
+        hasError = true;
       }
     }
 
     setErrors(newErrors);
+    if (hasError) {
+      toast.error('Vui lòng điền đầy đủ và đúng các trường bắt buộc!');
+    }
     return Object.keys(newErrors).length === 0;
   };
 
@@ -92,17 +106,24 @@ const Login = () => {
       const data = await response.json();
 
       if (data.success) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userToken', 'user-token');
-        setMessage('Đăng nhập thành công!');
-        setTimeout(() => {
-          navigate('/user/home');
-        }, 1000);
+        if (data.user && data.user.roleUser && data.user.roleUser.toLowerCase() === 'user') {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('userToken', 'user-token');
+          toast.success('Đăng nhập thành công!');
+          setTimeout(() => {
+            navigate('/user/home');
+          }, 1000);
+        } else if (data.user && (!data.user.roleUser || data.user.roleUser === null)) {
+          toast.error('Không xác định được vai trò tài khoản. Vui lòng liên hệ quản trị viên.');
+        } else {
+          toast.error('Chỉ tài khoản người dùng (User) mới được phép đăng nhập tại đây!');
+        }
       } else {
-        setMessage(data.message || 'Đăng nhập thất bại');
+        toast.error(data.message || 'Đăng nhập thất bại');
       }
     } catch (error) {
-      setMessage('Lỗi kết nối server');
+      // setMessage('Lỗi kết nối server');
+      toast.error('Lỗi kết nối server');
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
@@ -131,7 +152,8 @@ const Login = () => {
       const data = await response.json();
 
       if (data.success) {
-        setMessage('Đăng ký thành công! Vui lòng đăng nhập.');
+        // setMessage('Đăng ký thành công! Vui lòng đăng nhập.');
+        toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
         setIsLogin(true);
         setFormData({
           nameUser: '',
@@ -142,10 +164,12 @@ const Login = () => {
           fullName: ''
         });
       } else {
-        setMessage(data.message || 'Đăng ký thất bại');
+        // setMessage(data.message || 'Đăng ký thất bại');
+        toast.error(data.message || 'Đăng ký thất bại');
       }
     } catch (error) {
-      setMessage('Lỗi kết nối server');
+      // setMessage('Lỗi kết nối server');
+      toast.error('Lỗi kết nối server');
       console.error('Register error:', error);
     } finally {
       setIsLoading(false);
@@ -181,6 +205,7 @@ const Login = () => {
 
   return (
     <div className="user-login-page">
+      <ToastContainer position="top-right" autoClose={2000} />
       <div
         className={`user-login-card form-switch-fade ${formSwitching ? 'hide' : 'form-animate-pop-in'}`}
         style={{ position: 'relative' }}
@@ -196,12 +221,6 @@ const Login = () => {
           </p>
         </div>
 
-        {message && (
-          <div className={`user-message ${message.includes('thành công') ? 'success' : 'error'}`}>
-            {message}
-          </div>
-        )}
-
         <form className="user-login-form" onSubmit={handleSubmit}>
           <div className="user-form-group">
             <label className="user-form-label">Tên đăng nhập</label>
@@ -214,7 +233,6 @@ const Login = () => {
               placeholder="Nhập tên đăng nhập"
               disabled={isLoading}
             />
-            {errors.nameUser && <span className="user-error-text">{errors.nameUser}</span>}
           </div>
           <div className="user-form-group">
             <label className="user-form-label">Mật khẩu</label>
@@ -227,7 +245,6 @@ const Login = () => {
               placeholder="Nhập mật khẩu"
               disabled={isLoading}
             />
-            {errors.passWord && <span className="user-error-text">{errors.passWord}</span>}
             {isLogin && (
               <button
                 type="button"
@@ -253,7 +270,6 @@ const Login = () => {
                   placeholder="Nhập lại mật khẩu"
                   disabled={isLoading}
                 />
-                {errors.confirmPassword && <span className="user-error-text">{errors.confirmPassword}</span>}
               </div>
             </>
           )}

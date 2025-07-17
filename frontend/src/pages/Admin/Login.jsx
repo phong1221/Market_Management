@@ -53,18 +53,16 @@ const Login = () => {
       
       console.log('Response:', response.data)
       
-      if (response.data.success && response.data.user) {
-        // Lưu thông tin user vào localStorage
-        localStorage.setItem('user', JSON.stringify(response.data.user))
-        localStorage.setItem('isLoggedIn', 'true')
-        
-        // Hiển thị thông báo thành công
-        setNotification({ message: 'Đăng nhập thành công!', type: 'success' })
-        
-        // Chuyển hướng đến trang Home sau 1 giây
-        setTimeout(() => {
-          navigate('/admin/home')
-        }, 1000)
+      if (response.data.success) {
+        if (response.data.user && response.data.user.roleUser && response.data.user.roleUser.toLowerCase() === 'admin') {
+          localStorage.setItem('admin', JSON.stringify(response.data.user));
+          setNotification({ message: 'Đăng nhập thành công!', type: 'success' });
+          setTimeout(() => {
+            navigate('/admin');
+          }, 1000);
+        } else {
+          setNotification({ message: 'Chỉ tài khoản admin mới được phép đăng nhập!', type: 'error' });
+        }
       } else {
         setNotification({ 
           message: response.data.message || 'Đăng nhập thất bại', 

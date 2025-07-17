@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import './App.css'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Components
 import Header from './components/Header.jsx'
@@ -46,6 +48,7 @@ function App() {
 
   return (
     <div className="App">
+      <ToastContainer position="top-right" autoClose={2000} />
       {/* Header cho admin */}
       {showSidebar && <Header onSidebarToggle={setSidebarOpen} sidebarOpen={sidebarOpen} />}
       {/* Header cho user */}
