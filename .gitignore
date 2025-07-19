@@ -1,1 +1,41 @@
- 
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+
+# OAuth configuration files with real secrets
+backend/config/oauth.local.php
+frontend/src/config/oauth.local.js
+frontend/.env
+
+# Database configuration with secrets
+backend/config.local.env
+backend/config.env
+
+# Uploads directory (may contain sensitive files)
+backend/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db 

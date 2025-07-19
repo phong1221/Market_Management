@@ -1,17 +1,27 @@
-// OAuth Configuration - LOCAL FILE (DO NOT PUSH TO GIT)
-// Copy this file to oauth.js and fill in your actual credentials
+// OAuth Configuration
+// This file uses placeholder values for security
+// For development, create oauth.local.js with real credentials
+
+let localConfig = null;
+try {
+  localConfig = require('./oauth.local.js');
+} catch (e) {
+  // Local config not found, use placeholders
+}
 
 export const OAUTH_CONFIG = {
   // Google OAuth Configuration
   google: {
-    
+    clientId: localConfig?.oauthConfig?.google?.clientId || 'YOUR_GOOGLE_CLIENT_ID',
+    clientSecret: localConfig?.oauthConfig?.google?.clientSecret || 'YOUR_GOOGLE_CLIENT_SECRET',
+    redirectUri: localConfig?.oauthConfig?.google?.redirectUri || 'http://localhost:3000/oauth/callback/google',
     scope: 'email profile',
   },
   // Facebook OAuth Configuration
   facebook: {
-    appId: 'YOUR_FACEBOOK_APP_ID',
-    appSecret: 'YOUR_FACEBOOK_APP_SECRET',
-    redirectUri: 'http://localhost:3000/auth/facebook/callback',
+    appId: localConfig?.oauthConfig?.facebook?.appId || 'YOUR_FACEBOOK_APP_ID',
+    appSecret: localConfig?.oauthConfig?.facebook?.appSecret || 'YOUR_FACEBOOK_APP_SECRET',
+    redirectUri: localConfig?.oauthConfig?.facebook?.redirectUri || 'http://localhost:3000/oauth/callback/facebook',
     scope: 'email public_profile',
   }
 };
