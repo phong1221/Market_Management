@@ -56,9 +56,11 @@ const Login = () => {
       if (response.data.success) {
         if (response.data.user && response.data.user.roleUser && response.data.user.roleUser.toLowerCase() === 'admin') {
           localStorage.setItem('admin', JSON.stringify(response.data.user));
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('role', 'admin');
           setNotification({ message: 'Đăng nhập thành công!', type: 'success' });
           setTimeout(() => {
-            navigate('/admin');
+            navigate('/admin/home');
           }, 1000);
         } else {
           setNotification({ message: 'Chỉ tài khoản admin mới được phép đăng nhập!', type: 'error' });

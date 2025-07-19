@@ -21,6 +21,14 @@ const Home = () => {
   const [listSectionVisible, setListSectionVisible] = useState(false);
   const [colCount, setColCount] = useState(getColumnCount());
 
+  // Debug logs
+  console.log('UserHome component rendered');
+  console.log('localStorage data:', {
+    user: localStorage.getItem('user'),
+    isLoggedIn: localStorage.getItem('isLoggedIn'),
+    role: localStorage.getItem('role')
+  });
+
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -83,6 +91,8 @@ const Home = () => {
 
   return (
     <div className="home-user">
+
+      
       {/* Video background */}
       <video
         className="home-user-bg-video"
