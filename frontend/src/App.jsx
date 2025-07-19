@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 // Components
 import Header from './components/Header.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import OAuthCallback from './components/OAuthCallback.jsx'
 
 // Pages
 import Home from './pages/Admin/Home.jsx'
@@ -34,12 +35,22 @@ import Groceries from './pages/User/pages/Groceries';
 import Produce from './pages/User/pages/Produce';
 import Household from './pages/User/pages/Household';
 import Organic from './pages/User/pages/Organic';
+import AccountInfo from './pages/User/pages/AccountInfo';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
   const role = localStorage.getItem('role') // 'admin' hoặc 'user'
   const location = useLocation();
+  
+  // Debug logs
+  console.log('App.jsx debug:', {
+    isLoggedIn,
+    role,
+    pathname: location.pathname,
+    user: localStorage.getItem('user'),
+    admin: localStorage.getItem('admin')
+  });
 
   // Xác định có phải giao diện user không
   const isUserPage = location.pathname.startsWith('/user')
@@ -57,6 +68,9 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/admin/login" element={<Login />} />
+          {/* OAuth callback routes */}
+          <Route path="/auth/google/callback" element={<OAuthCallback />} />
+          <Route path="/auth/facebook/callback" element={<OAuthCallback />} />
           {/* Protected admin routes */}
           <Route path="/admin" element={<ProtectedRoute><Navigate to="/admin/home" replace /></ProtectedRoute>} />
           <Route path="/admin/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
@@ -73,6 +87,7 @@ function App() {
           {/* User routes */}
           <Route path="/user/home/:category" element={<UserHome />} />
           <Route path="/user/home" element={<UserHome />} />
+          <Route path="/user/account" element={<AccountInfo />} />
           <Route path="/user/groceries" element={<Groceries />} />
           <Route path="/user/produce" element={<Produce />} />
           <Route path="/user/household" element={<Household />} />

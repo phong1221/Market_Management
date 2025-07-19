@@ -1,56 +1,59 @@
 <?php
-// Bật hiển thị lỗi để debug
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// Cấu hình CORS và Content-Type
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-// Xử lý preflight request (OPTIONS)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
+    exit(0);
 }
 
 require_once '../../config/Database.php';
 
-// Khởi tạo kết nối database
-$database = new Database();
-$conn = $database->getConnection();
+try {
+    $idUser = $_GET['idUser'] ?? null;
+    
+    if (!$idUser) {
+        throw new Exception('User ID is required');
+    }
 
-// Kiểm tra kết nối
-if (!$conn) {
-    echo json_encode(["success" => false, "message" => "Lỗi kết nối cơ sở dữ liệu"]);
-    exit();
+    $database = new Database();
+    $db = $database->getConnection();
+
+    // Get user basic info
+    $user_query = "SELECT * FROM useraccount WHERE idUser = ?";
+    $user_stmt = $db->prepare($user_query);
+    $user_stmt->bind_param("i", $idUser);
+    $user_stmt->execute();
+    $user_result = $user_stmt->get_result();
+    $user = $user_result->fetch_assoc();
+
+    if (!$user) {
+        throw new Exception('User not found');
+    }
+
+    // Get user detailed info
+    $detail_query = "SELECT * FROM inforuser WHERE idUser = ?";
+    $detail_stmt = $db->prepare($detail_query);
+    $detail_stmt->bind_param("i", $idUser);
+    $detail_stmt->execute();
+    $detail_result = $detail_stmt->get_result();
+    $userInfo = $detail_result->fetch_assoc();
+
+    $response = [
+        'success' => true,
+        'message' => 'User info retrieved successfully',
+        'user' => $user,
+        'userInfo' => $userInfo
+    ];
+
+    echo json_encode($response);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: ' . $e->getMessage()
+    ]);
 }
-
-// Lấy idUser từ query parameter
-$idUser = isset($_GET['idUser']) ? intval($_GET['idUser']) : 0;
-
-if ($idUser <= 0) {
-    echo json_encode(["success" => false, "message" => "ID người dùng không hợp lệ"]);
-    exit();
-}
-
-// Truy vấn thông tin chi tiết người dùng
-// Giả sử bảng tên là `infor_user` và các cột khớp với model
-$sql = "SELECT idInfor, idUser, fullName, age, address, phone FROM inforuser WHERE idUser = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $idUser);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    $userDetails = $result->fetch_assoc();
-    echo json_encode(["success" => true, "data" => $userDetails]);
-} else {
-    // Nếu không có thông tin, trả về data: null để frontend xử lý
-    echo json_encode(["success" => true, "data" => null]);
-}
-
-$stmt->close();
-$conn->close();
 ?> 

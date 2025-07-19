@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import oauthService from '../../../services/oauthService';
 
 const Login = ({ isModal = false }) => {
   const navigate = useNavigate();
@@ -104,15 +105,39 @@ const Login = ({ isModal = false }) => {
       });
 
       const data = await response.json();
+      
+      console.log('Login response:', data);
 
       if (data.success) {
         if (data.user && data.user.roleUser && data.user.roleUser.toLowerCase() === 'user') {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('userToken', 'user-token');
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('role', 'user');
+          
+          console.log('Login successful, localStorage set:', {
+            user: localStorage.getItem('user'),
+            isLoggedIn: localStorage.getItem('isLoggedIn'),
+            role: localStorage.getItem('role')
+          });
+          
+          // Trigger custom event to notify Header component
+          window.dispatchEvent(new CustomEvent('userLoginStatusChanged'));
+          
           toast.success('Đăng nhập thành công!');
-          setTimeout(() => {
-            navigate('/user/home');
-          }, 1000);
+          
+          // Close modal if it's in modal mode
+          if (isModal) {
+            // Trigger modal close by calling parent's close function
+            setTimeout(() => {
+              window.location.href = '/user/home';
+            }, 1000);
+          } else {
+            setTimeout(() => {
+              console.log('Redirecting to /user/home...');
+              navigate('/user/home');
+            }, 1000);
+          }
         } else if (data.user && (!data.user.roleUser || data.user.roleUser === null)) {
           toast.error('Không xác định được vai trò tài khoản. Vui lòng liên hệ quản trị viên.');
         } else {
@@ -289,7 +314,16 @@ const Login = ({ isModal = false }) => {
             <button
               type="button"
               className="login-social-btn google"
-              onClick={() => alert('Tính năng đăng nhập Google đang phát triển')}
+              onClick={async () => {
+                try {
+                  setIsLoading(true);
+                  await oauthService.googleLogin();
+                } catch (error) {
+                  toast.error('Lỗi đăng nhập Google: ' + error.message);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
               disabled={isLoading}
             >
               <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Google" className="login-social-icon" />
@@ -298,7 +332,16 @@ const Login = ({ isModal = false }) => {
             <button
               type="button"
               className="login-social-btn facebook"
-              onClick={() => alert('Tính năng đăng nhập Facebook đang phát triển')}
+              onClick={async () => {
+                try {
+                  setIsLoading(true);
+                  await oauthService.facebookLogin();
+                } catch (error) {
+                  toast.error('Lỗi đăng nhập Facebook: ' + error.message);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
               disabled={isLoading}
             >
               <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" className="login-social-icon" />
