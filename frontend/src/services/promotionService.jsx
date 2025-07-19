@@ -10,18 +10,16 @@ export async function fetchPromotion() {
     try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        console.log("API response:", data);
-        return (data.data || []).map(item => new Promotion(
-            item.idPromotion,
-            item.namePromotion,
-            item.descriptionPromotion,
-            item.discountPromotion,
-            item.startDay,
-            item.endDay,
-            item.status
-        ));
+        console.log("Promotion API response:", data);
+        
+        if (data.success) {
+            return data.data || [];
+        } else {
+            console.error("Error fetching promotions:", data.message);
+            return [];
+        }
     } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+        console.error("Lỗi khi gọi API promotion:", error);
         return [];
     }
 }

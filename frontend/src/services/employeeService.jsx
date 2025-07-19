@@ -92,10 +92,15 @@ export async function deleteEmployee(idEmployee) {
         });
         const data = await response.json();
         console.log("API response:", data);
-        return data.success;
+        
+        if (data.success) {
+            return { success: true, message: data.message };
+        } else {
+            return { success: false, message: data.message };
+        }
     } catch (error) {
         console.error("Lỗi khi gọi API:", error);
-        return false;
+        return { success: false, message: "Lỗi kết nối server: " + error.message };
     }
 }
 

@@ -36,8 +36,9 @@ if (!$conn) {
     exit();
 }
 
-// Tạo truy vấn SQL
-$sql = "SELECT * FROM provider";
+// Tạo truy vấn SQL với JOIN để lấy thông tin loại sản phẩm
+$sql = "SELECT p.*, tp.nameType FROM provider p 
+        LEFT JOIN typeproduct tp ON p.idType = tp.idType";
 $result = $conn->query($sql);
 
 if ($result) {
@@ -48,7 +49,9 @@ if ($result) {
             "nameProvider" => $row["nameProvider"],
             "addressProvider" => $row["addressProvider"],
             "phoneProvider" => $row["phoneProvider"],
-            "emailProvider" => $row["emailProvider"]
+            "emailProvider" => $row["emailProvider"],
+            "idType" => $row["idType"],
+            "nameType" => $row["nameType"]
         ];
     }
     echo json_encode([

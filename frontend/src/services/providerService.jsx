@@ -10,13 +10,24 @@ export async function fetchProvider() {
         const response = await fetch(API_URL);
         const data = await response.json();
         console.log("API response:", data);
-        return (data.data || []).map(item => new Provider(
-            item.idProvider,
-            item.nameProvider,
-            item.addressProvider,
-            item.phoneProvider,
-            item.emailProvider
-        ));
+        console.log("Raw data from API:", data.data);
+        
+        if (data.data && data.data.length > 0) {
+            console.log("First provider data:", data.data[0]);
+        }
+        
+        return (data.data || []).map(item => {
+            console.log("Mapping provider item:", item);
+            return new Provider(
+                item.idProvider,
+                item.nameProvider,
+                item.addressProvider,
+                item.phoneProvider,
+                item.emailProvider,
+                item.idType,
+                item.nameType
+            );
+        });
     } catch (error) {
         console.error("Lỗi khi gọi API:", error);
         return [];
@@ -29,7 +40,8 @@ export async function addProvider(providerDTO) {
         !providerDTO.nameProvider ||
         !providerDTO.addressProvider ||
         !providerDTO.phoneProvider ||
-        !providerDTO.emailProvider
+        !providerDTO.emailProvider ||
+        !providerDTO.idType
     ) {
         console.error("Dữ liệu không hợp lệ:", providerDTO);
         return { success: false, message: "Dữ liệu không hợp lệ hoặc thiếu thông tin" };
@@ -44,7 +56,8 @@ export async function addProvider(providerDTO) {
             nameProvider: providerDTO.nameProvider,
             addressProvider: providerDTO.addressProvider,
             phoneProvider: providerDTO.phoneProvider,
-            emailProvider: providerDTO.emailProvider
+            emailProvider: providerDTO.emailProvider,
+            idType: parseInt(providerDTO.idType) || 1
         };
 
         // In ra dữ liệu JSON trước khi gửi
@@ -104,7 +117,8 @@ export async function updateProvider(providerDTO) {
         !providerDTO.nameProvider ||
         !providerDTO.addressProvider ||
         !providerDTO.phoneProvider ||
-        !providerDTO.emailProvider
+        !providerDTO.emailProvider ||
+        !providerDTO.idType
     ) {
         console.error("Dữ liệu không hợp lệ:", providerDTO);
         return { success: false, message: "Dữ liệu không hợp lệ hoặc thiếu thông tin" };
@@ -120,7 +134,8 @@ export async function updateProvider(providerDTO) {
             nameProvider: providerDTO.nameProvider,
             addressProvider: providerDTO.addressProvider,
             phoneProvider: providerDTO.phoneProvider,
-            emailProvider: providerDTO.emailProvider
+            emailProvider: providerDTO.emailProvider,
+            idType: parseInt(providerDTO.idType) || 1
         };
 
         // In ra dữ liệu JSON trước khi gửi

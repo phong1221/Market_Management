@@ -1,0 +1,105 @@
+/* Home Dashboard Styles - đồng bộ với employees.css */
+.home-page {
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home-title, .page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 32px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  margin-top: 24px;
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.10);
+  padding: 32px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  min-height: 260px;
+  backdrop-filter: blur(10px);
+}
+.dashboard-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(102, 126, 234, 0.18);
+}
+.dashboard-icon {
+  font-size: 3.2rem;
+  margin-bottom: 18px;
+  color: #667eea;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.12));
+}
+.dashboard-card h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+.dashboard-card p {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.btn, .home-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.18);
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 8px;
+}
+.btn:hover, .home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.28);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .dashboard-card {
+    padding: 24px 12px 18px 12px;
+    min-height: 200px;
+  }
+}
+@media (max-width: 600px) {
+  .home-title, .page-title {
+    font-size: 1.5rem;
+  }
+  .dashboard-card {
+    padding: 16px 6px 12px 6px;
+    min-height: 140px;
+  }
+  .dashboard-icon {
+    font-size: 2.1rem;
+  }
+}

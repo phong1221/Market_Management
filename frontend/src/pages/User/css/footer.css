@@ -1,0 +1,12 @@
+/* Footer styles */
+.footer-user {
+  width: 100vw;
+  background: #222;
+  color: #fff;
+  text-align: center;
+  padding: 32px 0 24px 0;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  position: relative;
+  bottom: 0;
+} 

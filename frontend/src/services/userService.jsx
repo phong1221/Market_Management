@@ -2,6 +2,7 @@ const API_URL = "http://localhost/market_management/backend/api/user/getUser.php
 const API_URL_ADD = "http://localhost/market_management/backend/api/user/addUser.php";
 const API_URL_UPDATE = "http://localhost/market_management/backend/api/user/updateUser.php";
 const API_URL_DELETE = "http://localhost/market_management/backend/api/user/deleteUser.php";
+const API_URL_DETAIL = "http://localhost/market_management/backend/api/user/getUserDetail.php";
 import User from '../models/user';
 
 export async function fetchUser() {
@@ -50,5 +51,20 @@ export async function deleteUser(idUser) {
         return data.success;
     } catch (error) {
         return false;
+    }
+}
+
+export async function fetchUserDetails(idUser) {
+    try {
+        const response = await fetch(`${API_URL_DETAIL}?idUser=${idUser}`);
+        const data = await response.json();
+        if (data.success) {
+            return data.data; // Trả về object chi tiết hoặc null
+        }
+        console.error("Lỗi từ API:", data.message);
+        return null;
+    } catch (error) {
+        console.error("Lỗi khi gọi API chi tiết người dùng:", error);
+        return null;
     }
 }
