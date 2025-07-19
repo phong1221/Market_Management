@@ -4,9 +4,7 @@
 export const OAUTH_CONFIG = {
   // Google OAuth Configuration
   google: {
-    clientId: '903101845353-uaktuct39n3fr8lse4hnp88bmh08tecq.apps.googleusercontent.com',
-    clientSecret: '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',
-    redirectUri: 'http://localhost:3000/auth/google/callback',
+    
     scope: 'email profile',
   },
   // Facebook OAuth Configuration

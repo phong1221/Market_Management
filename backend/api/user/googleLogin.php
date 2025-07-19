@@ -11,9 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../../config/Database.php';
 
 // Google OAuth Configuration
-$GOOGLE_CLIENT_ID = '903101845353-uaktuct39n3fr8lse4hnp88bmh08tecq.apps.googleusercontent.com';
-$GOOGLE_CLIENT_SECRET = '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';
-$GOOGLE_REDIRECT_URI = 'http://localhost:3000/auth/google/callback';
+
+
 
 try {
     // Get the authorization code from the request
