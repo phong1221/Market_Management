@@ -22,6 +22,20 @@
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Mặc định: chữ tối trên nền sáng */
+.header-user .logo,
+.header-user .nav a,
+.header-user .icon {
+  color: #222;
+}
+
+/* Khi scroll: chữ trắng trên nền tối */
+.header-user.scrolled .logo,
+.header-user.scrolled .nav a,
+.header-user.scrolled .icon {
+  color: #fff;
+}
+
 .header-user .logo {
   font-family: 'Pacifico', cursive;
   font-size: 2.2rem;
@@ -355,5 +369,39 @@
     width: 28px;
     height: 28px;
     padding: 5px;
+  }
+}
+
+/* Badge styles for wishlist and cart counts */
+.header-user .icon .badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePulse 0.3s ease;
+}
+
+@keyframes badgePulse {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  .header-user .icon .badge {
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: 3px;
+    right: 3px;
   }
 } 

@@ -1,0 +1,19 @@
+# Enable CORS
+# <IfModule mod_headers.c>
+#    Header always unset Access-Control-Allow-Origin
+#    Header always unset Access-Control-Allow-Methods
+#    Header always unset Access-Control-Allow-Headers
+
+#    Header always set Access-Control-Allow-Origin "http://localhost:3000"
+#    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+#    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+#    Header always set Vary "Origin"
+# </IfModule>
+
+# Let PHP handle preflight (OPTIONS)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Do not redirect OPTIONS; pass to PHP so scripts can 200 and exit
+    
+    # Giữ lại các cấu hình rewrite khác của bạn nếu có (ví dụ index.php...)
+</IfModule>

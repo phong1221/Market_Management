@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: transparent;
 }
 
 .main-content {
@@ -638,6 +639,25 @@ body.sidebar-closed .main-content {
   overflow-x: hidden;
 }
 
+.main-content.user-main {
+  padding-top: 80px;
+}
+@media (max-width: 1024px) {
+  .main-content.user-main {
+    padding-top: 70px;
+  }
+}
+@media (max-width: 768px) {
+  .main-content.user-main {
+    padding-top: 60px;
+  }
+}
+@media (max-width: 480px) {
+  .main-content.user-main {
+    padding-top: 55px;
+  }
+}
+
 html, body {
   width: 100vw;
   min-height: 100vh;
@@ -645,4 +665,5 @@ html, body {
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
+  background-color: transparent;
 }

@@ -4,35 +4,24 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-// Handle preflight request (OPTIONS)
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+header("Access-Control-Allow-Origin: *");
+// SỬA DÒNG NÀY: Thêm chữ DELETE vào
+header("Access-Control-Allow-Methods: DELETE, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
-include_once '../../config/Database.php';
-
 $database = new Database();
 $db = $database->getConnection();
 
-$idSalary = isset($_GET['idSalary']) ? $_GET['idSalary'] : die();
+// Get raw posted data
+$data = json_decode(file_get_contents("php://input"));
 
-$query = 'DELETE FROM salary WHERE idSalary = ?';
-
-$stmt = $db->prepare($query);
-
-if($stmt === false){
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Lỗi chuẩn bị câu lệnh SQL.']);
-    exit();
-}
-
-$idSalary = htmlspecialchars(strip_tags($idSalary));
+$stmt = $conn->prepare("DELETE FROM salary WHERE idSalary = ?");
+$stmt->bind_param("i", $idSalary);
 
 $stmt->bind_param('i', $idSalary);
 

@@ -1,0 +1,222 @@
+/* typeProduct.css - CSS chung cho Groceries, Household, Organic, Produce */
+
+.typeproduct-container {
+  background: #fff;
+  min-height: 100vh;
+  padding: 0;
+  font-family: inherit;
+}
+
+.typeproduct-breadcrumb {
+  font-size: 1rem;
+  color: #888;
+  padding: 32px 0 0 60px;
+}
+
+.typeproduct-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 8px 0 32px 60px;
+}
+
+.typeproduct-main {
+  display: flex;
+  align-items: flex-start;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.typeproduct-sidebar {
+  width: 260px;
+  min-width: 200px;
+  margin-right: 32px;
+}
+
+.typeproduct-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
+  gap: 32px;
+}
+
+.typeproduct-card {
+  background: #fafafa;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.18s, box-shadow 0.18s, background 0.18s, border 0.18s;
+}
+.typeproduct-card:hover {
+  transform: translateY(-8px) scale(1.04);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.13), 0 4px 16px rgba(0,0,0,0.10);
+  background: #fffbe9;
+  border: 2px solid #ffb347;
+}
+
+.typeproduct-sale {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #111;
+  color: #fff;
+  border-radius: 6px;
+  padding: 4px 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  z-index: 2;
+}
+
+.typeproduct-img {
+  width: 100%;
+  max-width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: #f8f8f8;
+  margin: 18px auto 0 auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  display: block;
+  transition: transform 0.25s cubic-bezier(.4,2,.6,1), box-shadow 0.25s cubic-bezier(.4,2,.6,1);
+  padding: 8px;
+}
+.typeproduct-card:hover .typeproduct-img {
+  transform: scale(1.07) rotate(-2deg);
+  box-shadow: 0 8px 24px rgba(255,179,71,0.13);
+}
+
+.typeproduct-info {
+  padding: 18px 20px 20px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.typeproduct-name {
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.typeproduct-price {
+  font-size: 1.1rem;
+  color: #222;
+  font-weight: 600;
+}
+
+.typeproduct-price .old {
+  text-decoration: line-through;
+  color: #888;
+  font-weight: 400;
+  margin-right: 8px;
+}
+
+.typeproduct-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.wishlist-btn, .cart-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  color: #888;
+}
+.wishlist-btn.active {
+  color: #ff6b6b;
+  background: #fff0f0;
+}
+.wishlist-btn:hover, .cart-btn:hover {
+  background: #f0f0f0;
+  color: #222;
+}
+
+/* Sidebar filter for Groceries, Household, Organic, Produce */
+.sidebar-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+.sidebar-search {
+  margin-bottom: 16px;
+}
+.sidebar-search-input {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+.sidebar-price {
+  margin-bottom: 24px;
+}
+.sidebar-price-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.sidebar-price-value {
+  color: #007bff;
+}
+.sidebar-range {
+  width: 100%;
+}
+.sidebar-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #888;
+}
+.sidebar-reset {
+  margin-bottom: 24px;
+}
+.sidebar-reset-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+.sidebar-reset-btn:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 900px) {
+  .typeproduct-main {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 8px;
+  }
+  .typeproduct-sidebar {
+    margin-right: 0;
+    margin-bottom: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .typeproduct-title { font-size: 1.5rem; margin-left: 16px; }
+  .typeproduct-breadcrumb { padding-left: 16px; }
+  .typeproduct-main { padding: 0 2px; }
+  .typeproduct-sidebar { min-width: 120px; width: 100%; }
+  .typeproduct-grid { gap: 12px; grid-template-columns: 1fr; }
+  .typeproduct-card { border-radius: 8px; }
+  .typeproduct-img { height: 120px; border-radius: 8px 8px 0 0; }
+}

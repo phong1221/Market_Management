@@ -51,7 +51,7 @@ const Header = ({ onSidebarToggle, sidebarOpen }) => {
           height: '100vh',
           position: 'fixed',
           left: open ? 0 : '-260px',
-          top: 0,
+          top: 0, // Đặt lại top về 0
           zIndex: 200,
           transition: 'left 0.3s',
           width: 260,

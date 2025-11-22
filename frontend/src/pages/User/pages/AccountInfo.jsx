@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import '../css/accountInfo.css';
+import { useAuth } from '../../../hooks/useAuth';
 
 const AccountInfo = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const [userInfo, setUserInfo] = useState({
     fullName: '',
     age: '',
@@ -18,19 +19,15 @@ const AccountInfo = () => {
 
   useEffect(() => {
     // Kiểm tra xem user có đăng nhập không
-    const userData = localStorage.getItem('user');
-    if (!userData) {
+    if (!user) {
       toast.error('Vui lòng đăng nhập để xem thông tin cá nhân');
       navigate('/user/home');
       return;
     }
-
-    const userObj = JSON.parse(userData);
-    setUser(userObj);
     
     // Load thông tin chi tiết của user
-    loadUserInfo(userObj.idUser);
-  }, [navigate]);
+    loadUserInfo(user.idUser);
+  }, [navigate, user]);
 
   const loadUserInfo = async (userId) => {
     try {
@@ -106,10 +103,7 @@ const AccountInfo = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('role');
+    logout();
     toast.success('Đăng xuất thành công!');
     navigate('/user/home');
   };

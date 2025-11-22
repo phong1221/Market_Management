@@ -5,12 +5,13 @@ const API_URL_UPDATE = "http://localhost/market_management/backend/api/brand/upd
 
 export async function fetchBrand() {
     try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        console.log("API response:", data);
-        return data.data || [];
-    } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
+        const res = await fetch('http://localhost/market_management/backend/api/brand/getBrand.php');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+            return data.data;
+        }
+        return [];
+    } catch (e) {
         return [];
     }
 }
