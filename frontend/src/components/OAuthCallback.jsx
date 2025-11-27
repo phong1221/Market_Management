@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import oauthService from '../services/oauthService';
+import { useAuth } from '../hooks/useAuth';
 
 // Global flag to prevent duplicate success messages
 let hasShownOAuthSuccess = false;
@@ -10,6 +11,7 @@ const OAuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isProcessing, setIsProcessing] = useState(true);
+  const { login } = useAuth();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -99,16 +101,13 @@ const OAuthCallback = () => {
         console.log('OAuth result:', result);
 
         if (result.success) {
-          // Store user data
-          localStorage.setItem('user', JSON.stringify(result.user));
-          localStorage.setItem('userToken', result.token || 'oauth-token');
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('role', 'user');
+          // Store user data using the hook
+          login(result.user, 'user');
           
           console.log('OAuth login successful, stored data:', {
             user: result.user,
-            isLoggedIn: localStorage.getItem('isLoggedIn'),
-            role: localStorage.getItem('role')
+            isLoggedIn: true,
+            role: 'user'
           });
           
           // Show success message only once using global flag

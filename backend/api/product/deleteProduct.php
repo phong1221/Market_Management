@@ -5,12 +5,11 @@ ini_set('display_errors', 1);
 
 // Cấu hình CORS và Content-Type
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+// SỬA DÒNG NÀY: Thêm chữ DELETE vào
+header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-// Xử lý preflight request (OPTIONS)
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }

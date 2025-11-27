@@ -1,0 +1,11 @@
+version: "3.1"
+
+intents:
+  - greet
+  - ask_opening_hours
+
+responses:
+  utter_greet:
+    - text: "Xin chào! Tôi có thể giúp gì cho bạn?"
+  utter_opening_hours:
+    - text: "Cửa hàng mở cửa từ 8h sáng đến 10h tối mỗi ngày."

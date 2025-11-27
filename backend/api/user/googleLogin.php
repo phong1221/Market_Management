@@ -1,15 +1,27 @@
 <?php
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit(0);
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit();
 }
 
 require_once '../../config/Database.php';
-require_once '../../config/oauth.php';
+
+// Try to load local config first, fallback to placeholder config
+if (file_exists('../../config/oauth.local.php')) {
+    require_once '../../config/oauth.local.php';
+    error_log('Loaded OAuth config from oauth.local.php');
+} else {
+    require_once '../../config/oauth.php';
+    error_log('Loaded OAuth config from oauth.php (placeholder)');
+}
+
+// Debug: Log OAuth configuration
+error_log('OAuth Config - Client ID: ' . substr($GOOGLE_CLIENT_ID, 0, 20) . '...');
+error_log('OAuth Config - Redirect URI: ' . $GOOGLE_REDIRECT_URI);
 
 
 

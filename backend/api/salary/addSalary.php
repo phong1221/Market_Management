@@ -4,28 +4,28 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods,Authorization,X-Requested-With');
 
-// Handle preflight OPTIONS request
+header("Access-Control-Allow-Origin: *");
+// SỬA DÒNG NÀY: Thêm chữ DELETE vào
+header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS"); 
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Include database file
-include_once '../../config/Database.php';
+// Kiểm tra phương thức request
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["success" => false, "message" => "Chỉ chấp nhận phương thức POST"]);
+    exit();
+}
 
-// Instantiate Database and get connection
-$database = new Database();
-$db = $database->getConnection();
+require_once '../../config/Database.php';
 
-// Get raw posted data
-$data = json_decode(file_get_contents("php://input"));
+// Lấy dữ liệu từ body
+$data = json_decode(file_get_contents("php://input"), true);
 
-// Check if data is not empty
+// Kiểm tra dữ liệu đầu vào
 if (
     !empty($data->idEmployee) &&
     isset($data->basicSalary) &&

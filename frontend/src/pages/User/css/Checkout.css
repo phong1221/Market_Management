@@ -1,0 +1,196 @@
+/* Overlay background for checkout page */
+.checkout-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 8px;
+}
+
+.checkout-container {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  padding: 36px 32px 28px 32px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  animation: checkout-pop-in 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes checkout-pop-in {
+  0% { opacity: 0; transform: scale(0.7); }
+  80% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.checkout-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.checkout-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.checkout-form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+.checkout-form-group input[type="text"],
+.checkout-form-group input[type="tel"],
+.checkout-form-group input[type="number"],
+.checkout-form-group input[type="email"],
+.checkout-form-group input:not([type="radio"]):not([type="checkbox"]) {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  font-size: 15px;
+  background: #f8fafc;
+  color: #222;
+  transition: border 0.2s;
+}
+.checkout-form-group input:focus {
+  border-color: #38bdf8;
+  outline: none;
+}
+
+.checkout-radio-group {
+  display: flex;
+  gap: 18px;
+  margin-top: 2px;
+}
+.checkout-radio-group label {
+  font-weight: 500;
+  color: #222;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.checkout-radio-group input[type="radio"] {
+  accent-color: #38bdf8;
+  width: 16px;
+  height: 16px;
+}
+
+.checkout-error {
+  color: #e53e3e;
+  font-size: 13px;
+  margin-top: 2px;
+  font-weight: 500;
+  animation: error-fade-in 0.3s;
+}
+@keyframes error-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.checkout-submit-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 12px 0;
+  background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(56,189,248,0.13);
+  transition: background 0.2s, transform 0.2s;
+  letter-spacing: 1px;
+}
+.checkout-submit-btn:hover {
+  background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+@media (max-width: 600px) {
+  .checkout-container {
+    padding: 18px 4px 14px 4px;
+    max-width: 99vw;
+  }
+  .checkout-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* VNPay Modal Styles */
+.vnpay-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.vnpay-modal {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+}
+
+.vnpay-close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  z-index: 10;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.vnpay-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-20px) scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}

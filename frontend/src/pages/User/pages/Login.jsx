@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 import oauthService from '../../../services/oauthService';
+import { useAuth } from '../../../hooks/useAuth.js';
 
 const Login = ({ isModal = false }) => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     nameUser: '',
@@ -110,19 +111,13 @@ const Login = ({ isModal = false }) => {
 
       if (data.success) {
         if (data.user && data.user.roleUser && data.user.roleUser.toLowerCase() === 'user') {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          localStorage.setItem('userToken', 'user-token');
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('role', 'user');
+          login(data.user, 'user');
           
           console.log('Login successful, localStorage set:', {
-            user: localStorage.getItem('user'),
-            isLoggedIn: localStorage.getItem('isLoggedIn'),
-            role: localStorage.getItem('role')
+            user: data.user,
+            isLoggedIn: true,
+            role: 'user'
           });
-          
-          // Trigger custom event to notify Header component
-          window.dispatchEvent(new CustomEvent('userLoginStatusChanged'));
           
           toast.success('Đăng nhập thành công!');
           
@@ -230,7 +225,6 @@ const Login = ({ isModal = false }) => {
 
   return (
     <div className="user-login-page">
-      <ToastContainer position="top-right" autoClose={2000} />
       <div
         className={`user-login-card form-switch-fade ${formSwitching ? 'hide' : 'form-animate-pop-in'}`}
         style={{ position: 'relative' }}

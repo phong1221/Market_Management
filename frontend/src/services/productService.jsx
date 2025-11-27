@@ -5,78 +5,91 @@ const API_URL_UPDATE = "http://localhost/market_management/backend/api/product/u
 import Product from '../models/product';
 
 export async function fetchProduct() {
-    try {
-        console.log('=== FETCH PRODUCT DEBUG ===');
-        console.log('Calling API URL:', API_URL);
-        
-        const response = await fetch(API_URL);
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
-        
-        const data = await response.json();
-        console.log("API response:", data);
-        console.log("API response.success:", data.success);
-        console.log("API response.data:", data.data);
-        console.log("API response.data length:", data.data ? data.data.length : 'no data');
-        
-        // Trả về dữ liệu gốc từ API thay vì tạo object Product
-        const result = data.data || [];
-        console.log("Returning result:", result);
-        return result;
-    } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
-        console.error("Error details:", error.message);
-        return [];
-    }
+	try {
+		console.log('=== FETCH PRODUCT DEBUG ===');
+		console.log('Calling API URL:', API_URL);
+		
+		const response = await fetch(API_URL, { method: 'GET', credentials: 'omit' });
+		console.log('Response status:', response.status);
+		console.log('Response ok:', response.ok);
+		
+		if (!response.ok) {
+			const text = await response.text().catch(() => '');
+			console.error('Non-OK response body:', text);
+			throw new Error(`HTTP ${response.status}`);
+		}
+		
+		const contentType = response.headers.get('content-type') || '';
+		if (!contentType.includes('application/json')) {
+			const text = await response.text().catch(() => '');
+			console.error('Unexpected content-type:', contentType, 'Body:', text);
+			throw new Error('Invalid content-type');
+		}
+		
+		const data = await response.json();
+		console.log("API response:", data);
+		console.log("API response.success:", data.success);
+		console.log("API response.data:", data.data);
+		console.log("API response.data length:", data.data ? data.data.length : 'no data');
+		
+		// Trả về dữ liệu gốc từ API thay vì tạo object Product
+		const result = data.data || [];
+		console.log("Returning result:", result);
+		return result;
+	} catch (error) {
+		console.error("Lỗi khi gọi API:", error);
+		console.error("Error details:", error.message);
+		return [];
+	}
 }
 
 export async function addProduct(formData) {
-    try {
-        const response = await fetch(API_URL_ADD, {
-            method: "POST",
-            body: formData // Send FormData directly
-        });
+	try {
+		const response = await fetch(API_URL_ADD, {
+			method: "POST",
+			body: formData // Send FormData directly
+		});
 
-        const result = await response.json();
-        console.log("Server response on add:", result);
-        return result;
-    } catch (error) {
-        console.error("Lỗi khi thêm sản phẩm:", error);
-        return { success: false, message: "Lỗi khi thêm sản phẩm: " + error.message };
-    }
+		const result = await response.json();
+		console.log("Server response on add:", result);
+		return result;
+	} catch (error) {
+		console.error("Lỗi khi thêm sản phẩm:", error);
+		return { success: false, message: "Lỗi khi thêm sản phẩm: " + error.message };
+	}
 }
 
 export async function deleteProduct(idProduct) {
-    try {
-        const response = await fetch(API_URL_DELETE + `?idProduct=${idProduct}`, {
-            method: "DELETE"
-        });
-        const data = await response.json();
-        console.log("API response:", data);
-        
-        if (data.success) {
-            return { success: true, message: data.message || "Xóa sản phẩm thành công!" };
-        } else {
-            return { success: false, message: data.message || "Lỗi khi xóa sản phẩm" };
-        }
-    } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
-        return { success: false, message: "Lỗi khi xóa sản phẩm: " + error.message };
-    }
+	try {
+		const response = await fetch(API_URL_DELETE + `?idProduct=${idProduct}`, {
+			method: "DELETE"
+		});
+		const data = await response.json();
+		console.log("API response:", data);
+		
+		if (data.success) {
+			return { success: true, message: data.message || "Xóa sản phẩm thành công!" };
+		} else {
+			return { success: false, message: data.message || "Lỗi khi xóa sản phẩm" };
+		}
+	} catch (error) {
+		console.error("Lỗi khi gọi API:", error);
+		return { success: false, message: "Lỗi khi xóa sản phẩm: " + error.message };
+	}
 }
 
 export async function updateProduct(formData) {
-    try {
-        const response = await fetch(API_URL_UPDATE, {
-            method: "POST", // Use POST for FormData with file uploads
-            body: formData // Send FormData directly
-        });
-        
-        const result = await response.json();
-        console.log("Server response on update:", result);
-        return result;
-    } catch (error) {
-        console.error("Lỗi khi cập nhật sản phẩm:", error);
-        return { success: false, message: "Lỗi khi cập nhật sản phẩm: " + error.message };
-    }
+	try {
+		const response = await fetch(API_URL_UPDATE, {
+			method: "POST", // Use POST for FormData with file uploads
+			body: formData // Send FormData directly
+		});
+		
+		const result = await response.json();
+		console.log("Server response on update:", result);
+		return result;
+	} catch (error) {
+		console.error("Lỗi khi cập nhật sản phẩm:", error);
+		return { success: false, message: "Lỗi khi cập nhật sản phẩm: " + error.message };
+	}
 }

@@ -1,5 +1,12 @@
 import { OAUTH_CONFIG, OAUTH_ENDPOINTS, BACKEND_OAUTH_ENDPOINTS } from '../config/oauth.js';
 
+// Debug: Log OAuth config to check if credentials are loaded
+console.log('OAuth Config loaded:', {
+  googleClientId: OAUTH_CONFIG.google.clientId,
+  googleRedirectUri: OAUTH_CONFIG.google.redirectUri,
+  hasLocalConfig: true
+});
+
 class OAuthService {
   // Demo mode flag
   isDemoMode = false; // Set to false when using real credentials
@@ -68,12 +75,16 @@ class OAuthService {
     }
 
     try {
+      const state = this.generateState();
+      // Store state for verification
+      sessionStorage.setItem('oauth_state', state);
+      
       const params = new URLSearchParams({
         client_id: OAUTH_CONFIG.facebook.appId,
         redirect_uri: OAUTH_CONFIG.facebook.redirectUri,
         response_type: 'code',
         scope: OAUTH_CONFIG.facebook.scope,
-        state: this.generateState()
+        state: state
       });
 
       const authUrl = `${OAUTH_ENDPOINTS.facebook.auth}?${params.toString()}`;
