@@ -24,7 +24,7 @@ const Brands = () => {
 
   const IMAGE_BASE_URL = 'http://localhost/market_management/backend/uploads/';
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchBrands()
   }, [])
 
@@ -64,11 +64,11 @@ const Brands = () => {
     setModalType("edit");
     setEditingBrand(brand);
     setSelectedLogo(null);
-    
+
     // Construct the dynamic image URL for the preview
     const imageSrc = brand.logoBrand ? `${IMAGE_BASE_URL}${brand.logoBrand}` : '';
     setLogoPreview(imageSrc);
-    
+
     setShowModal(true);
   };
 
@@ -149,11 +149,11 @@ const Brands = () => {
         const currentTotalItems = filteredBrands.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentBrands.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Logic điều hướng trang sau khi xóa:
         // 1. Nếu trang hiện tại lớn hơn số trang mới và có ít nhất 1 trang, chuyển về trang đầu tiên
         // 2. Nếu xóa phần tử cuối cùng của trang và không phải trang đầu tiên, chuyển về trang trước
@@ -163,7 +163,7 @@ const Brands = () => {
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchBrands();
         setNotification({ message: "Xóa nhãn hàng thành công!", type: "success" });
       } else {
@@ -203,13 +203,13 @@ const Brands = () => {
 
   const filteredBrands = filterData();
   const totalPages = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentBrands = filteredBrands.slice(startIndex, endIndex);
@@ -302,9 +302,9 @@ const Brands = () => {
             }
           }}
         />
-        <span 
-          style={{ 
-            color: '#999', 
+        <span
+          style={{
+            color: '#999',
             fontStyle: 'italic',
             display: 'none',
             position: 'absolute',
@@ -345,15 +345,15 @@ const Brands = () => {
       )}
       <div className="brands-page-header">
         <h1 className="brands-page-title">Quản lý nhãn hàng</h1>
-        <button 
-          className="brands-btn brands-btn-primary" 
+        <button
+          className="brands-btn brands-btn-primary"
           onClick={handleAdd}
         >
           Thêm nhãn hàng mới
         </button>
       </div>
 
-      <div className="brands-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -362,7 +362,7 @@ const Brands = () => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="brands-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -370,7 +370,7 @@ const Brands = () => {
             setSearchCriteria(e.target.value);
             setCurrentPage(1);
           }}
-          className="brands-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameBrand">Tên nhãn hàng</option>
@@ -403,7 +403,7 @@ const Brands = () => {
                   required
                 />
               </div>
-              
+
               <div className="brands-form-group">
                 <label className="brands-form-label">Logo: <span style={{ color: '#666', fontSize: '12px' }}>(Tùy chọn)</span></label>
                 <input
@@ -414,13 +414,13 @@ const Brands = () => {
                 />
                 {logoPreview && (
                   <div style={{ marginTop: '10px' }}>
-                    <img 
-                      src={logoPreview} 
-                      alt="Logo preview" 
-                      style={{ 
-                        width: '120px', 
-                        height: '120px', 
-                        objectFit: 'contain', 
+                    <img
+                      src={logoPreview}
+                      alt="Logo preview"
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        objectFit: 'contain',
                         border: '1px solid #ddd',
                         borderRadius: '8px',
                         backgroundColor: '#f8f9fa',
@@ -430,7 +430,7 @@ const Brands = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="brands-form-actions">
                 <button type="submit" className="brands-btn brands-btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
                 <button type="button" className="brands-btn brands-btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
@@ -459,7 +459,7 @@ const Brands = () => {
                 </td>
                 <td>{brand.nameBrand}</td>
                 <td>
-                  <button 
+                  <button
                     className="brands-btn brands-btn-secondary brands-btn-sm"
                     onClick={() => handleDelete(brand.idBrand)}
                   >

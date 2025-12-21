@@ -43,7 +43,7 @@ const Promotions = () => {
       // Sắp xếp theo ID tăng dần
       const sortedData = data.sort((a, b) => parseInt(a.idPromotion) - parseInt(b.idPromotion));
       setPromotions(sortedData)
-      
+
       // Tự động tạo id mới khi thêm
       const maxId = Math.max(...sortedData.map(promotion => parseInt(promotion.idPromotion, 10)), 0);
       setFormData(prev => ({
@@ -98,12 +98,12 @@ const Promotions = () => {
       setNotification({ message: 'Vui lòng nhập phần trăm giảm giá hợp lệ', type: 'error' })
       return
     }
-    
+
     // Kiểm tra ngày bắt đầu và kết thúc
     if (!validateDates(formData.startDay, formData.endDay)) {
       return
     }
-    
+
     try {
       if (formType === 'edit') {
         const result = await updatePromotion(formData)
@@ -142,18 +142,18 @@ const Promotions = () => {
         const currentTotalItems = filteredPromotions.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentPromotions.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Logic điều hướng trang sau khi xóa
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(1);
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchPromotions()
         setNotification({ message: 'Xóa khuyến mãi thành công', type: 'success' })
       } else {
@@ -227,13 +227,13 @@ const Promotions = () => {
 
   const filteredPromotions = filterData()
   const totalPages = Math.ceil(filteredPromotions.length / ITEMS_PER_PAGE)
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentPromotions = filteredPromotions.slice(startIndex, endIndex)
@@ -323,15 +323,15 @@ const Promotions = () => {
       )}
       <div className="promotions-page-header">
         <h1 className="promotions-page-title">Quản lý khuyến mãi</h1>
-        <button 
-          className="promotions-btn promotions-btn-primary" 
+        <button
+          className="promotions-btn promotions-btn-primary"
           onClick={handleAdd}
         >
           Thêm khuyến mãi mới
         </button>
       </div>
 
-      <div className="promotions-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -340,7 +340,7 @@ const Promotions = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="promotions-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -348,7 +348,7 @@ const Promotions = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="promotions-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="namePromotion">Tên khuyến mãi</option>
@@ -378,29 +378,29 @@ const Promotions = () => {
                   type="text"
                   className="promotions-form-input"
                   value={formData.namePromotion}
-                  onChange={(e) => setFormData({...formData, namePromotion: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, namePromotion: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="promotions-form-group">
                 <label className="promotions-form-label">Mô tả:</label>
                 <textarea
                   className="promotions-form-input"
                   value={formData.descriptionPromotion}
-                  onChange={(e) => setFormData({...formData, descriptionPromotion: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, descriptionPromotion: e.target.value })}
                   required
                   rows="3"
                 />
               </div>
-              
+
               <div className="promotions-form-group">
                 <label className="promotions-form-label">Phần trăm giảm giá (%):</label>
                 <input
                   type="number"
                   className="promotions-form-input"
                   value={formData.discountPromotion}
-                  onChange={(e) => setFormData({...formData, discountPromotion: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, discountPromotion: e.target.value })}
                   min="0"
                   max="100"
                   step="0.01"
@@ -416,7 +416,7 @@ const Promotions = () => {
                   value={formData.startDay}
                   onChange={(e) => {
                     const newStartDay = e.target.value
-                    setFormData({...formData, startDay: newStartDay})
+                    setFormData({ ...formData, startDay: newStartDay })
                     validateDates(newStartDay, formData.endDay)
                   }}
                   required
@@ -431,13 +431,13 @@ const Promotions = () => {
                   value={formData.endDay}
                   onChange={(e) => {
                     const newEndDay = e.target.value
-                    setFormData({...formData, endDay: newEndDay})
+                    setFormData({ ...formData, endDay: newEndDay })
                     validateDates(formData.startDay, newEndDay)
                   }}
                   required
                 />
               </div>
-              
+
               {dateError && (
                 <div className="promotions-form-group">
                   <div className="promotions-error-message">
@@ -448,8 +448,8 @@ const Promotions = () => {
 
               <div className="promotions-form-actions">
                 <button type="submit" className="promotions-btn promotions-btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="promotions-btn promotions-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
@@ -490,19 +490,19 @@ const Promotions = () => {
                   </span>
                 </td>
                 <td>
-                  <button 
+                  <button
                     className="promotions-btn promotions-btn-primary promotions-btn-sm"
                     onClick={() => handleEdit(promotion)}
                   >
                     Sửa
                   </button>
-                  <button 
+                  <button
                     className="promotions-btn promotions-btn-info promotions-btn-sm"
                     onClick={() => handleHide(promotion.idPromotion)}
                   >
                     {promotion.status === 'Active' || promotion.status === 'Hoạt động' ? 'Ẩn' : 'Hiện'}
                   </button>
-                  <button 
+                  <button
                     className="promotions-btn promotions-btn-secondary promotions-btn-sm"
                     onClick={() => handleDelete(promotion.idPromotion)}
                   >

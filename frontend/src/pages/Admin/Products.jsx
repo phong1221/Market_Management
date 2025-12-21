@@ -85,13 +85,13 @@ const Products = () => {
         fetch('http://localhost/market_management/backend/api/promotion/getPromotion.php').then(res => res.json()),
         fetchBrand()
       ])
-      
+
       setProducts(productsData.data || [])
       setProviders(providersData.data || [])
       setCategories(categoriesData.data || [])
       setPromotions(promotionsData.data || [])
       setBrands(brandsData || [])
-      
+
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -138,7 +138,7 @@ const Products = () => {
         // If not editing image, pass the existing picture name
         data.append('existing_picture', editingProduct.picture);
       }
-      
+
       let result;
       if (editingProduct) {
         // Append the product ID for updates
@@ -147,7 +147,7 @@ const Products = () => {
       } else {
         result = await addProduct(data);
       }
-      
+
       if (result.success) {
         showNotification(result.message, 'success')
         setShowForm(false)
@@ -179,11 +179,11 @@ const Products = () => {
     }
     console.log('Setting form data:', formDataToSet);
     setFormData(formDataToSet)
-    
+
     // Construct the dynamic image URL for the preview
     const imageSrc = product.picture ? `${IMAGE_BASE_URL}${product.picture}` : '';
     setImagePreview(imageSrc);
-    
+
     setShowForm(true)
   }
 
@@ -195,7 +195,7 @@ const Products = () => {
           // Xóa ảnh khỏi localStorage
           const imageKey = `product_image_${idProduct}`
           localStorage.removeItem(imageKey)
-          
+
           showNotification(result.message, 'success')
           fetchData()
         } else {
@@ -295,8 +295,8 @@ const Products = () => {
     <div className="products-page">
       <div className="products-page-header">
         <h1 className="products-page-title">Quản lý sản phẩm</h1>
-        <button 
-          className="products-btn products-btn-primary products-btn-sm" 
+        <button
+          className="products-btn products-btn-primary products-btn-sm"
           onClick={() => setShowForm(true)}
         >
           Thêm sản phẩm
@@ -314,11 +314,11 @@ const Products = () => {
                   type="text"
                   className="products-form-input"
                   value={formData.nameProduct}
-                  onChange={(e) => setFormData({...formData, nameProduct: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, nameProduct: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Hình ảnh sản phẩm:</label>
                 <input
@@ -329,9 +329,9 @@ const Products = () => {
                 />
                 {imagePreview && (
                   <div style={{ marginTop: '10px' }}>
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
                       className="product-image"
                       style={{ width: '120px', height: '120px' }}
                       onError={(e) => { e.target.style.display = 'none'; }}
@@ -339,23 +339,23 @@ const Products = () => {
                   </div>
                 )}
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Mô tả:</label>
                 <textarea
                   className="products-form-input"
                   value={formData.descriptionProduct}
-                  onChange={(e) => setFormData({...formData, descriptionProduct: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, descriptionProduct: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Nhà cung cấp:</label>
                 <select
                   className="products-form-input"
                   value={formData.idProvider || ''}
-                  onChange={(e) => setFormData({...formData, idProvider: e.target.value ? parseInt(e.target.value) : ''})}
+                  onChange={(e) => setFormData({ ...formData, idProvider: e.target.value ? parseInt(e.target.value) : '' })}
                   required
                 >
                   <option value="">Chọn nhà cung cấp</option>
@@ -366,7 +366,7 @@ const Products = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Số lượng:</label>
                 <input
@@ -376,19 +376,19 @@ const Products = () => {
                   value={formData.amountProduct === '' ? '' : formData.amountProduct}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setFormData({...formData, amountProduct: value === '' ? '' : parseInt(value) || 0});
+                    setFormData({ ...formData, amountProduct: value === '' ? '' : parseInt(value) || 0 });
                   }}
                   min="0"
                   required
                 />
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Danh mục:</label>
                 <select
                   className="products-form-input"
                   value={formData.idType || ''}
-                  onChange={(e) => setFormData({...formData, idType: e.target.value ? parseInt(e.target.value) : ''})}
+                  onChange={(e) => setFormData({ ...formData, idType: e.target.value ? parseInt(e.target.value) : '' })}
                   required
                 >
                   <option value="">Chọn danh mục</option>
@@ -399,39 +399,39 @@ const Products = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Giá nhập:</label>
                 <input
                   type="number"
                   className="products-form-input"
                   value={formData.importCost || ''}
-                  onChange={(e) => setFormData({...formData, importCost: e.target.value ? parseFloat(e.target.value) : ''})}
+                  onChange={(e) => setFormData({ ...formData, importCost: e.target.value ? parseFloat(e.target.value) : '' })}
                   min="0"
                   step="1000"
                   required
                 />
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Giá bán:</label>
                 <input
                   type="number"
                   className="products-form-input"
                   value={formData.exportCost || ''}
-                  onChange={(e) => setFormData({...formData, exportCost: e.target.value ? parseFloat(e.target.value) : ''})}
+                  onChange={(e) => setFormData({ ...formData, exportCost: e.target.value ? parseFloat(e.target.value) : '' })}
                   min="0"
                   step="1000"
                   required
                 />
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Thương hiệu:</label>
                 <select
                   className="products-form-input"
                   value={formData.idBrand || ''}
-                  onChange={(e) => setFormData({...formData, idBrand: e.target.value ? parseInt(e.target.value) : ''})}
+                  onChange={(e) => setFormData({ ...formData, idBrand: e.target.value ? parseInt(e.target.value) : '' })}
                   required
                 >
                   <option value="">Chọn thương hiệu</option>
@@ -442,13 +442,13 @@ const Products = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="products-form-group">
                 <label className="products-form-label">Khuyến mãi:</label>
                 <select
                   className="products-form-input"
                   value={formData.idPromotion || ''}
-                  onChange={(e) => setFormData({...formData, idPromotion: e.target.value ? parseInt(e.target.value) : null})}
+                  onChange={(e) => setFormData({ ...formData, idPromotion: e.target.value ? parseInt(e.target.value) : null })}
                 >
                   <option value="">Không có khuyến mãi</option>
                   {promotions.map(promotion => (
@@ -458,13 +458,13 @@ const Products = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="products-form-actions">
                 <button type="submit" className="products-btn products-btn-primary">
                   {editingProduct ? 'Cập nhật' : 'Lưu'}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="products-btn products-btn-secondary"
                   onClick={handleCancel}
                 >
@@ -476,7 +476,7 @@ const Products = () => {
         </div>
       )}
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -485,8 +485,7 @@ const Products = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="products-form-input"
-          style={{ flex: 1 }}
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -494,8 +493,7 @@ const Products = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="products-form-input"
-          style={{ width: 'auto' }}
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameProduct">Tên sản phẩm</option>
@@ -538,19 +536,19 @@ const Products = () => {
           <tbody>
             {currentProducts.map((product) => {
               const category = categories.find(c => c.idType === product.idType);
-              
+
               // Sửa logic tìm khuyến mãi để xử lý cả string và number
-              const promotion = promotions.find(p => 
+              const promotion = promotions.find(p =>
                 p.idPromotion == product.idPromotion || // So sánh lỏng lẻo
                 p.idPromotion === parseInt(product.idPromotion) || // Chuyển đổi sang number
                 p.idPromotion === String(product.idPromotion) // Chuyển đổi sang string
               );
-              
+
               // Debug: Log thông tin khuyến mãi
               console.log('Product:', product.idProduct, 'idPromotion:', product.idPromotion, 'type:', typeof product.idPromotion);
               console.log('Available promotions:', promotions.map(p => ({ id: p.idPromotion, name: p.namePromotion })));
               console.log('Found promotion:', promotion);
-              
+
               console.log('Rendering product:', product.idProduct, 'with buttons');
               return (
                 <tr key={product.idProduct}>
@@ -579,7 +577,7 @@ const Products = () => {
                       </span>
                     ) : (
                       <span className="status-badge out-of-stock">
-                        Không có 
+                        Không có
                       </span>
                     )}
                   </td>

@@ -14,6 +14,7 @@ const Wishlist = () => {
   const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     console.log('Wishlist useEffect triggered, user:', user);
     // Kiểm tra đăng nhập
     if (!user) {

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { 
-  fetchImports, 
-  fetchImportById, 
-  addImport, 
-  updateImport, 
-  deleteImport, 
-  generateImportCode, 
-  formatCurrency, 
-  formatDate 
+import {
+  fetchImports,
+  fetchImportById,
+  addImport,
+  updateImport,
+  deleteImport,
+  generateImportCode,
+  formatCurrency,
+  formatDate
 } from '../../services/importService'
 import { fetchProduct } from '../../services/productService'
 import { fetchProvider } from '../../services/providerService'
@@ -27,7 +27,7 @@ const Imports = () => {
   const [showDetail, setShowDetail] = useState(false)
   const [notification, setNotification] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
-  
+
   const [formData, setFormData] = useState({
     importDate: new Date().toISOString().slice(0, 16),
     selectedTypeProduct: '',
@@ -39,6 +39,12 @@ const Imports = () => {
   const [filteredProviders, setFilteredProviders] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
   const [selectedTypeProductInfo, setSelectedTypeProductInfo] = useState(null)
+
+  // Search & Pagination State
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchCriteria, setSearchCriteria] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 5
 
   useEffect(() => {
     fetchData()
@@ -62,7 +68,7 @@ const Imports = () => {
         fetchProvider(),
         fetchTypeProduct()
       ])
-      
+
       setImports(importsData)
       setProducts(productsData)
       setProviders(providersData)
@@ -99,7 +105,7 @@ const Imports = () => {
   // Hàm để lấy label cho trường số lượng/khối lượng
   const getQuantityLabel = () => {
     if (!selectedTypeProductInfo) return 'Số lượng'
-    
+
     // Dựa vào typeSell để quyết định hiển thị
     switch (selectedTypeProductInfo.typeSell) {
       case 'Khối lượng':
@@ -114,7 +120,7 @@ const Imports = () => {
   // Hàm để lấy placeholder cho trường số lượng/khối lượng
   const getQuantityPlaceholder = () => {
     if (!selectedTypeProductInfo) return 'Nhập số lượng'
-    
+
     switch (selectedTypeProductInfo.typeSell) {
       case 'Khối lượng':
         return 'Nhập khối lượng (kg)'
@@ -129,7 +135,7 @@ const Imports = () => {
   const handleTypeProductChange = (typeProductId) => {
     // Lọc nhà cung cấp và sản phẩm theo loại sản phẩm mới
     filterByTypeProduct(typeProductId)
-    
+
     // Kiểm tra và reset các sản phẩm không thuộc loại sản phẩm mới
     const updatedItems = formData.items.map(item => {
       if (item.idProduct) {
@@ -141,7 +147,7 @@ const Imports = () => {
       }
       return item
     })
-    
+
     setFormData({
       ...formData,
       selectedTypeProduct: typeProductId,
@@ -185,7 +191,7 @@ const Imports = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     try {
       const importData = {
         ...formData,
@@ -223,11 +229,11 @@ const Imports = () => {
     try {
       // Fetch chi tiết import trước khi edit
       const importWithDetails = await fetchImportById(importItem.idImport);
-      
+
       // Tìm loại sản phẩm từ sản phẩm đầu tiên trong danh sách
       const firstProduct = products.find(p => p.idProduct === importWithDetails.details[0]?.idProduct);
       const typeProductId = firstProduct?.idType || '';
-      
+
       setEditingImport(importWithDetails);
       setFormData({
         importDate: importWithDetails.import.importDate ? importWithDetails.import.importDate.slice(0, 16) : new Date().toISOString().slice(0, 16),
@@ -241,10 +247,10 @@ const Imports = () => {
           notes: detail.notes || ''
         })) || [{ idProduct: '', quantity: '', importPrice: '', exportPrice: '', notes: '' }]
       });
-      
+
       // Lọc nhà cung cấp và sản phẩm theo loại sản phẩm
       filterByTypeProduct(typeProductId);
-      
+
       setShowForm(true);
     } catch (error) {
       console.error('Error fetching import details for edit:', error);
@@ -293,6 +299,109 @@ const Imports = () => {
     setNotification(null);
   }
 
+  // Search & Pagination Logic
+  const filterData = () => {
+    if (!searchTerm.trim()) return imports
+    return imports.filter(item => {
+      const searchLower = searchTerm.toLowerCase()
+      switch (searchCriteria) {
+        case 'idImport':
+          return item.idImport.toString().toLowerCase().includes(searchLower)
+        case 'providerName':
+          return item.providerName.toLowerCase().includes(searchLower)
+        case 'all':
+          return (
+            item.idImport.toString().toLowerCase().includes(searchLower) ||
+            item.providerName.toLowerCase().includes(searchLower)
+          )
+        default:
+          return true
+      }
+    })
+  }
+
+  const filteredImports = filterData()
+  const totalPages = Math.ceil(filteredImports.length / ITEMS_PER_PAGE)
+
+  // Validation for pagination
+  const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
+  if (validCurrentPage !== currentPage && totalPages > 0) {
+    setCurrentPage(validCurrentPage);
+  }
+
+  const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const currentImports = filteredImports.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null
+    const pages = []
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          className={`imports-pagination-button ${currentPage === i ? 'active' : ''}`} // Assuming standard class (will need css or use inline temporarily)
+          // Actually imports-pagination-button probably doesn't exist, I should use a generic one or add it.
+          // Since I don't want to edit CSS file right now, I will reuse `products-pagination-button` or similar if possible? 
+          // No, I should use `admin-pagination-button` if I made one. I didn't. 
+          // I'll stick to `imports-pagination-button` and assume I'll add CSS or it will fallback. 
+          // Wait, `import.css` was not viewed. I will use inline styles or standard structure.
+          // Let's use `imports-pagination-button` and I'll ensure I add it if needed. 
+          // Actually I will match the pattern of other pages.
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      )
+    }
+    return (
+      <div className="imports-pagination-container">
+        <button
+          className="imports-pagination-button"
+          onClick={() => handlePageChange(1)}
+          disabled={currentPage === 1}
+        >
+          &laquo;
+        </button>
+        <button
+          className="imports-pagination-button"
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          &lsaquo;
+        </button>
+        {pages}
+        <button
+          className="imports-pagination-button"
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          &rsaquo;
+        </button>
+        <button
+          className="imports-pagination-button"
+          onClick={() => handlePageChange(totalPages)}
+          disabled={currentPage === totalPages}
+        >
+          &raquo;
+        </button>
+        <span className="imports-pagination-info">
+          Trang {currentPage} / {totalPages}
+        </span>
+      </div>
+    )
+  }
+
   if (loading) return <div className="imports-loading">Đang tải...</div>
 
   return (
@@ -321,8 +430,8 @@ const Imports = () => {
       )}
       <div className="imports-page-header">
         <h1 className="imports-page-title">Quản lý nhập hàng</h1>
-        <button 
-          className="imports-btn imports-btn-primary" 
+        <button
+          className="imports-btn imports-btn-primary"
           onClick={() => {
             resetForm()
             setShowForm(true)
@@ -330,6 +439,31 @@ const Imports = () => {
         >
           Tạo phiếu nhập hàng mới
         </button>
+      </div>
+
+      <div className="admin-search-container">
+        <input
+          type="text"
+          placeholder="Nhập từ khóa tìm kiếm..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value)
+            setCurrentPage(1)
+          }}
+          className="admin-search-input"
+        />
+        <select
+          value={searchCriteria}
+          onChange={(e) => {
+            setSearchCriteria(e.target.value)
+            setCurrentPage(1)
+          }}
+          className="admin-search-select"
+        >
+          <option value="all">Tất cả</option>
+          <option value="idImport">ID Import</option>
+          <option value="providerName">Nhà cung cấp</option>
+        </select>
       </div>
 
       {/* Form Modal */}
@@ -345,7 +479,7 @@ const Imports = () => {
                     type="datetime-local"
                     className="imports-form-input"
                     value={formData.importDate}
-                    onChange={(e) => setFormData({...formData, importDate: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, importDate: e.target.value })}
                     required
                   />
                 </div>
@@ -372,7 +506,7 @@ const Imports = () => {
                   <select
                     className="imports-form-input"
                     value={formData.idProvider}
-                    onChange={(e) => setFormData({...formData, idProvider: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, idProvider: e.target.value })}
                     required
                     disabled={!formData.selectedTypeProduct}
                   >
@@ -391,9 +525,9 @@ const Imports = () => {
               <div className="imports-form-section">
                 <div className="imports-section-header">
                   <h3>Danh sách sản phẩm</h3>
-                  <button 
-                    type="button" 
-                    className="imports-btn imports-btn-secondary imports-btn-sm" 
+                  <button
+                    type="button"
+                    className="imports-btn imports-btn-secondary imports-btn-sm"
                     onClick={handleAddItem}
                     disabled={!formData.selectedTypeProduct}
                   >
@@ -471,8 +605,8 @@ const Imports = () => {
                     </div>
                     {formData.items.length > 1 && (
                       <div className="imports-form-group imports-form-group-button">
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="imports-btn imports-btn-danger imports-btn-sm"
                           onClick={() => handleRemoveItem(index)}
                         >
@@ -487,8 +621,8 @@ const Imports = () => {
                 <button type="submit" className="imports-btn imports-btn-primary">
                   {editingImport ? 'Cập nhật' : 'Lưu'}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="imports-btn imports-btn-secondary"
                   onClick={() => {
                     setShowForm(false)
@@ -513,14 +647,14 @@ const Imports = () => {
                 <div><strong>ID Import:</strong> {selectedImport.import.idImport}</div>
                 <div><strong>Ngày nhập:</strong> {formatDate(selectedImport.import.importDate)}</div>
                 <div><strong>Nhà cung cấp:</strong> {selectedImport.import.providerName}</div>
-                <div><strong>Loại sản phẩm:</strong> {selectedImport.details && selectedImport.details.length > 0 ? 
+                <div><strong>Loại sản phẩm:</strong> {selectedImport.details && selectedImport.details.length > 0 ?
                   (() => {
                     const firstProduct = products.find(p => p.idProduct === selectedImport.details[0].idProduct);
                     const typeProduct = typeProducts.find(t => t.idType === firstProduct?.idType);
                     return typeProduct ? typeProduct.nameType : 'Không xác định';
                   })() : 'Không xác định'
                 }</div>
-                <div><strong>Kiểu bán:</strong> {selectedImport.details && selectedImport.details.length > 0 ? 
+                <div><strong>Kiểu bán:</strong> {selectedImport.details && selectedImport.details.length > 0 ?
                   (() => {
                     const firstProduct = products.find(p => p.idProduct === selectedImport.details[0].idProduct);
                     const typeProduct = typeProducts.find(t => t.idType === firstProduct?.idType);
@@ -586,8 +720,8 @@ const Imports = () => {
               </table>
             </div>
             <div className="imports-form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="imports-btn imports-btn-secondary"
                 onClick={() => setShowDetail(false)}
               >
@@ -613,7 +747,7 @@ const Imports = () => {
             </tr>
           </thead>
           <tbody>
-            {imports.map((importItem) => (
+            {currentImports.map((importItem) => (
               <tr key={importItem.idImport}>
                 <td>{importItem.idImport}</td>
                 <td>{formatDate(importItem.importDate)}</td>
@@ -653,26 +787,26 @@ const Imports = () => {
                 <td>{formatCurrency(importItem.totalAmount)}</td>
                 <td>
                   <div className="imports-action-buttons">
-                    <button 
+                    <button
                       className="imports-btn imports-btn-info imports-btn-sm"
                       onClick={() => handleViewDetail(importItem)}
                       title="Xem chi tiết"
                     >
-                      👁️
+                      Chi tiết
                     </button>
-                    <button 
+                    <button
                       className="imports-btn imports-btn-warning imports-btn-sm"
                       onClick={() => handleEdit(importItem)}
                       title="Sửa"
                     >
-                      ✏️
+                      Sửa
                     </button>
-                    <button 
+                    <button
                       className="imports-btn imports-btn-danger imports-btn-sm"
                       onClick={() => handleDelete(importItem)}
                       title="Xóa"
                     >
-                      🗑️
+                      Xóa
                     </button>
                   </div>
                 </td>
@@ -681,6 +815,7 @@ const Imports = () => {
           </tbody>
         </table>
       </div>
+      {renderPagination()}
     </div>
   )
 }

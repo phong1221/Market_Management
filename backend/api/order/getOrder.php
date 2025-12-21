@@ -35,6 +35,35 @@ try {
     $orders = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
+            $idOrder = $row['idOrder'];
+            
+            // Get order details
+            $detailQuery = "SELECT 
+                              od.idProduct,
+                              p.nameProduct,
+                              od.quantity,
+                              od.unitPrice as price,
+                              od.totalPrice
+                            FROM `order_detail` od
+                            LEFT JOIN `product` p ON od.idProduct = p.idProduct
+                            WHERE od.idOrder = ?";
+            
+            $detailStmt = $conn->prepare($detailQuery);
+            if ($detailStmt) {
+                $detailStmt->bind_param("i", $idOrder);
+                $detailStmt->execute();
+                $detailResult = $detailStmt->get_result();
+                
+                $details = [];
+                if ($detailResult) {
+                     while ($detailRow = $detailResult->fetch_assoc()) {
+                         $details[] = $detailRow;
+                     }
+                }
+                $detailStmt->close();
+            }
+            
+            $row['details'] = $details;
             $orders[] = $row;
         }
     }

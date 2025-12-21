@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Cấu hình CORS và Content-Type
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, PUT, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
@@ -41,11 +42,13 @@ if (!$conn) {
     exit();
 }
 
+$hashedPassword = password_hash($data['passWord'], PASSWORD_DEFAULT);
+
 $stmt = $conn->prepare("UPDATE useraccount SET nameUser = ?, passWord = ?, roleUser = ? WHERE idUser = ?");
 $stmt->bind_param(
     "sssi",
     $data['nameUser'],
-    $data['passWord'],
+    $hashedPassword,
     $data['roleUser'],
     $data['idUser']
 );

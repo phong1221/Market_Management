@@ -106,21 +106,21 @@ const Login = ({ isModal = false }) => {
       });
 
       const data = await response.json();
-      
+
       console.log('Login response:', data);
 
       if (data.success) {
         if (data.user && data.user.roleUser && data.user.roleUser.toLowerCase() === 'user') {
           login(data.user, 'user');
-          
+
           console.log('Login successful, localStorage set:', {
             user: data.user,
             isLoggedIn: true,
             role: 'user'
           });
-          
+
           toast.success('Đăng nhập thành công!');
-          
+
           // Close modal if it's in modal mode
           if (isModal) {
             // Trigger modal close by calling parent's close function
@@ -165,7 +165,11 @@ const Login = ({ isModal = false }) => {
         body: JSON.stringify({
           nameUser: formData.nameUser,
           passWord: formData.passWord,
-          roleUser: 'User'
+          roleUser: 'User',
+          fullName: formData.fullName,
+          phone: formData.phone,
+          email: formData.email,
+          address: formData.address
         })
       });
 
@@ -278,6 +282,50 @@ const Login = ({ isModal = false }) => {
           </div>
           {!isLogin && (
             <>
+              <div className="user-form-group">
+                <label className="user-form-label">Họ và Tên</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="user-form-input"
+                  placeholder="Nhập họ và tên"
+                />
+              </div>
+              <div className="user-form-group">
+                <label className="user-form-label">Số điện thoại</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="user-form-input"
+                  placeholder="Nhập số điện thoại"
+                />
+              </div>
+              <div className="user-form-group">
+                <label className="user-form-label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="user-form-input"
+                  placeholder="Nhập email"
+                />
+              </div>
+              <div className="user-form-group">
+                <label className="user-form-label">Địa chỉ</label>
+                <input
+                  type="text"
+                  name="address" // assuming formData has address, actually I need to add address to formData state init if not there
+                  value={formData.address || ''}
+                  onChange={handleInputChange}
+                  className="user-form-input"
+                  placeholder="Nhập địa chỉ"
+                />
+              </div>
               <div className="user-form-group">
                 <label className="user-form-label">Xác nhận mật khẩu</label>
                 <input

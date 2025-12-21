@@ -23,20 +23,56 @@ function loginUser() {
 		}
 		
 		$username = $conn->real_escape_string($data['nameUser']);
-		$password = $conn->real_escape_string($data['passWord']);
+		$password = $data['passWord'];
 		
-		// Kiểm tra tài khoản trong bảng useraccount (không chỉ Admin)
-		$query = "SELECT * FROM useraccount WHERE nameUser = '$username' AND passWord = '$password' LIMIT 1";
+		// Tìm user theo username
+		$query = "SELECT * FROM useraccount WHERE nameUser = '$username' LIMIT 1";
 		$result = $conn->query($query);
 		
 		if ($result && $result->num_rows > 0) {
 			$user = $result->fetch_assoc();
-			unset($user['passWord']);
-			echo json_encode([
-				'success' => true,
-				'message' => 'Đăng nhập thành công',
-				'user' => $user
-			]);
+			$stored_pass = $user['passWord'];
+			
+			$verificationSuccess = false;
+			$needsRehash = false;
+
+			// 1. Kiểm tra hash (nếu mật khẩu đã mã hóa)
+			if (password_verify($password, $stored_pass)) {
+				$verificationSuccess = true;
+				if (password_needs_rehash($stored_pass, PASSWORD_DEFAULT)) {
+					$needsRehash = true;
+				}
+			}
+			// 2. Fallback: Kiểm tra plain text (cho mật khẩu cũ chưa mã hóa)
+			elseif ($stored_pass === $password) {
+				$verificationSuccess = true;
+				$needsRehash = true; // Cần mã hóa ngay lập tức
+			}
+
+			if ($verificationSuccess) {
+				// Nếu cần mã hóa lại (hoặc mới mã hóa lần đầu), cập nhật vào DB
+				if ($needsRehash) {
+					$newHash = password_hash($password, PASSWORD_DEFAULT);
+					$uid = $user['idUser'];
+					// Dùng Prepared Statement cho an toàn
+					$updateStmt = $conn->prepare("UPDATE useraccount SET passWord = ? WHERE idUser = ?");
+					$updateStmt->bind_param("si", $newHash, $uid);
+					$updateStmt->execute();
+					$updateStmt->close();
+				}
+
+				unset($user['passWord']);
+				echo json_encode([
+					'success' => true,
+					'message' => 'Đăng nhập thành công',
+					'user' => $user
+				]);
+			} else {
+				echo json_encode([
+					'success' => false,
+					'message' => 'Tên đăng nhập hoặc mật khẩu không đúng'
+				]);
+			}
 		} else {
 			echo json_encode([
 				'success' => false,

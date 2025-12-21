@@ -34,9 +34,9 @@ const Login = () => {
       // Test API connection first
       const apiWorking = await testAPI()
       if (!apiWorking) {
-        setNotification({ 
-          message: 'Không thể kết nối đến API server. Vui lòng kiểm tra backend server.', 
-          type: 'error' 
+        setNotification({
+          message: 'Không thể kết nối đến API server. Vui lòng kiểm tra backend server.',
+          type: 'error'
         })
         setLoading(false)
         return
@@ -44,15 +44,15 @@ const Login = () => {
 
       console.log('Đang gửi request đăng nhập...')
       console.log('Data:', { nameUser: formData.username, passWord: formData.password })
-      
+
       // Gọi API đăng nhập admin
       const response = await axios.post('http://localhost/market_management/backend/api/user/loginUser.php', {
         nameUser: formData.username,
         passWord: formData.password
       })
-      
+
       console.log('Response:', response.data)
-      
+
       if (response.data.success) {
         if (response.data.user && response.data.user.roleUser && response.data.user.roleUser.toLowerCase() === 'admin') {
           localStorage.setItem('admin', JSON.stringify(response.data.user));
@@ -66,17 +66,17 @@ const Login = () => {
           setNotification({ message: 'Chỉ tài khoản admin mới được phép đăng nhập!', type: 'error' });
         }
       } else {
-        setNotification({ 
-          message: response.data.message || 'Đăng nhập thất bại', 
-          type: 'error' 
+        setNotification({
+          message: response.data.message || 'Đăng nhập thất bại',
+          type: 'error'
         })
       }
     } catch (error) {
       console.error('Login error:', error)
       console.error('Error response:', error.response?.data)
-      
+
       let errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng'
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message
       } else if (error.code === 'ERR_NETWORK') {
@@ -84,7 +84,7 @@ const Login = () => {
       } else if (error.response?.status === 500) {
         errorMessage = 'Lỗi server. Vui lòng thử lại sau.'
       }
-      
+
       setNotification({ message: errorMessage, type: 'error' })
     } finally {
       setLoading(false)
@@ -103,31 +103,31 @@ const Login = () => {
           <h1 className="login-title">Đăng nhập Admin</h1>
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
+              <label className="form-label">Tên đăng nhập</label>
               <input
                 type="text"
                 className="form-input"
                 value={formData.username}
-                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 required
                 disabled={loading}
-                placeholder=" "
+                placeholder="Nhập tên đăng nhập"
               />
-              <label className="form-label">Tên đăng nhập</label>
             </div>
             <div className="form-group">
+              <label className="form-label">Mật khẩu</label>
               <input
                 type="password"
                 className="form-input"
                 value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 disabled={loading}
-                placeholder=" "
+                placeholder="Nhập mật khẩu"
               />
-              <label className="form-label">Mật khẩu</label>
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="login-btn"
               disabled={loading}
             >

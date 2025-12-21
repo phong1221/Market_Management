@@ -1,6 +1,6 @@
 .account-info-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1a1a1a;
   padding-top: 120px;
   display: flex;
   justify-content: center;
@@ -8,21 +8,23 @@
 }
 
 .account-info-card {
-  background: white;
+  background: #2a2a2a;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   width: 100%;
   max-width: 800px;
   overflow: hidden;
+  border: 2px solid #ffd700;
 }
 
 .account-info-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #1a1a1a;
+  color: #ffd700;
   padding: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px solid #ffd700;
 }
 
 .account-info-header h1 {
@@ -32,18 +34,19 @@
 }
 
 .back-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  background: #ffd700;
+  border: 2px solid #ffd700;
+  color: #1a1a1a;
   padding: 10px 20px;
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .back-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #fff;
   transform: translateY(-2px);
 }
 
@@ -56,10 +59,10 @@
 }
 
 .info-section h2 {
-  color: #333;
+  color: #ffd700;
   font-size: 20px;
   margin-bottom: 20px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #ffd700;
   padding-bottom: 10px;
 }
 
@@ -77,18 +80,19 @@
 }
 
 .edit-btn {
-  background: #667eea;
-  color: white;
+  background: #ffd700;
+  color: #1a1a1a;
   border: none;
   padding: 10px 20px;
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
   transition: all 0.3s ease;
 }
 
 .edit-btn:hover {
-  background: #5a6fd8;
+  background: #fff;
   transform: translateY(-2px);
 }
 
@@ -112,24 +116,24 @@
 
 .info-item label {
   font-weight: 600;
-  color: #666;
+  color: #ffd700;
   font-size: 14px;
 }
 
 .info-item span {
-  color: #333;
+  color: #fff;
   font-size: 16px;
   padding: 10px;
-  background: #f8f9fa;
+  background: #1a1a1a;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #ffd700;
 }
 
 .info-form {
-  background: #f8f9fa;
+  background: #1a1a1a;
   padding: 25px;
   border-radius: 10px;
-  border: 1px solid #e9ecef;
+  border: 2px solid #333;
 }
 
 .form-row {
@@ -147,31 +151,37 @@
 
 .form-group label {
   font-weight: 600;
-  color: #333;
+  color: #ffd700;
   font-size: 14px;
 }
 
 .form-group input {
   padding: 12px 15px;
-  border: 2px solid #e9ecef;
+  border: 2px solid #333;
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.3s ease;
+  background: #2a2a2a;
+  color: #fff;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #666;
 }
 
 .form-group span {
-  color: #333;
+  color: #fff;
   font-size: 16px;
   padding: 12px 15px;
-  background: white;
+  background: #2a2a2a;
   border-radius: 8px;
-  border: 2px solid #e9ecef;
+  border: 2px solid #333;
 }
 
 .form-actions {
@@ -184,8 +194,8 @@
 }
 
 .save-btn {
-  background: #28a745;
-  color: white;
+  background: #ffd700;
+  color: #1a1a1a;
   border: none;
   padding: 12px 25px;
   border-radius: 25px;
@@ -196,7 +206,7 @@
 }
 
 .save-btn:hover {
-  background: #218838;
+  background: #fff;
   transform: translateY(-2px);
 }
 
@@ -207,9 +217,9 @@
 }
 
 .cancel-btn {
-  background: #6c757d;
-  color: white;
-  border: none;
+  background: #2a2a2a;
+  color: #fff;
+  border: 2px solid #666;
   padding: 12px 25px;
   border-radius: 25px;
   cursor: pointer;
@@ -219,7 +229,8 @@
 }
 
 .cancel-btn:hover {
-  background: #5a6268;
+  background: #333;
+  border-color: #888;
   transform: translateY(-2px);
 }
 
@@ -233,11 +244,11 @@
   text-align: center;
   margin-top: 40px;
   padding-top: 30px;
-  border-top: 1px solid #e9ecef;
+  border-top: 2px solid #333;
 }
 
 .logout-btn {
-  background: #dc3545;
+  background: #ff6b6b;
   color: white;
   border: none;
   padding: 15px 30px;
@@ -249,14 +260,14 @@
 }
 
 .logout-btn:hover {
-  background: #c82333;
+  background: #ff5252;
   transform: translateY(-2px);
 }
 
 .loading {
   text-align: center;
   padding: 40px;
-  color: #666;
+  color: #ffd700;
   font-size: 18px;
 }
 

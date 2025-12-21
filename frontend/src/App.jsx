@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import './App.css'
+import './css/admin-search.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from './hooks/useAuth';
@@ -24,17 +25,21 @@ import Salary from './pages/Admin/Salary.jsx'
 import Brands from './pages/Admin/Brands.jsx'
 import Login from './pages/Admin/Login.jsx'
 import Orders from './pages/Admin/Order'
-// import AccountInfo from './pages/Admin/AccountInfo.jsx' 
+import Statistics from './pages/Admin/Statistics.jsx'
+import POS from './pages/Admin/POS.jsx'
+import Customers from './pages/Admin/Customers.jsx'
+import PaymentHistory from './pages/Admin/PaymentHistory.jsx'
+import AdminCoupons from './pages/Admin/Coupons.jsx'
+import Permissions from './pages/Admin/Permissions.jsx'
 
 // User Components
 import UserHeader from './pages/User/components/Header.jsx'
 import UserFooter from './pages/User/components/Footer.jsx'
 import UserHome from './pages/User/components/Home.jsx'
 
-import Groceries from './pages/User/pages/Groceries';
-import Produce from './pages/User/pages/Produce';
-import Household from './pages/User/pages/Household';
-import Organic from './pages/User/pages/Organic';
+import TypeProductPage from './pages/User/pages/TypeProductPage';
+import StoreInfo from './pages/User/pages/StoreInfo';
+import Contact from './pages/User/pages/Contact';
 import AccountInfo from './pages/User/pages/AccountInfo';
 import Wishlist from './pages/User/pages/Wishlist';
 import ShoppingCart from './pages/User/pages/ShoppingCart';
@@ -45,6 +50,7 @@ import OrderHistoryDebug from './pages/User/pages/OrderHistoryDebug.jsx';
 import VNPayReturn from './pages/User/pages/VNPayReturn.jsx';
 import VNPayDemo from './pages/User/pages/VNPayDemo.jsx';
 import VNPayTest from './components/VNPayTest.jsx';
+import Coupons from './pages/User/pages/Coupons.jsx';
 
 
 function App() {
@@ -52,7 +58,7 @@ function App() {
   const { isLoggedIn, role, user } = useAuth();
   const location = useLocation();
   const state = location.state;
-  
+
   // Debug logs
   console.log('App.jsx debug:', {
     isLoggedIn,
@@ -64,15 +70,15 @@ function App() {
 
   // Xác định có phải giao diện user không
   const isUserPage =
-  location.pathname.startsWith('/user') ||
-  location.pathname.startsWith('/vnpay_return');
+    location.pathname.startsWith('/user') ||
+    location.pathname.startsWith('/vnpay_return');
   // Chỉ render sidebar nếu đã đăng nhập, KHÔNG ở trang login, và là admin
   const showSidebar = isLoggedIn && location.pathname !== '/admin/login' && !isUserPage;
 
   return (
     <div className="App">
-      <ToastContainer 
-        position="top-right" 
+      <ToastContainer
+        position="top-right"
         autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -107,6 +113,12 @@ function App() {
           <Route path="/admin/salary" element={<ProtectedRoute><Salary /></ProtectedRoute>} />
           <Route path="/admin/brands" element={<ProtectedRoute><Brands /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/admin/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
+          <Route path="/admin/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/admin/payment-history" element={<ProtectedRoute><PaymentHistory /></ProtectedRoute>} />
+          <Route path="/admin/coupons" element={<ProtectedRoute><AdminCoupons /></ProtectedRoute>} />
+          <Route path="/admin/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
+          <Route path="/admin/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
           {/* User routes */}
           <Route path="/user/home/:category" element={<UserHome />} />
           <Route path="/user/home" element={<UserHome />} />
@@ -115,11 +127,11 @@ function App() {
           <Route path="/user/orders-debug" element={<ProtectedUserRoute><OrderHistoryDebug /></ProtectedUserRoute>} />
           <Route path="/user/wishlist" element={<ProtectedUserRoute><Wishlist /></ProtectedUserRoute>} />
           <Route path="/user/cart" element={<ProtectedUserRoute><ShoppingCart /></ProtectedUserRoute>} />
-          <Route path="/user/groceries" element={<Groceries />} />
-          <Route path="/user/produce" element={<Produce />} />
-          <Route path="/user/household" element={<Household />} />
-          <Route path="/user/organic" element={<Organic />} />
+          <Route path="/user/category/:idType" element={<TypeProductPage />} />
+          <Route path="/user/store-info" element={<StoreInfo />} />
+          <Route path="/user/contact" element={<Contact />} />
           <Route path="/user/checkout" element={<Checkout />} />
+          <Route path="/user/coupons" element={<Coupons />} />
           <Route path="/user/product/:idProduct" element={<ProductDetail />} />
           <Route path="/vnpay_return" element={<VNPayReturn />} />
           <Route path="/vnpay-demo" element={<VNPayDemo />} />

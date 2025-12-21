@@ -46,11 +46,11 @@ const Salary = () => {
         fetchSalary(),
         fetchEmployee()
       ])
-      
+
       salariesData.sort((a, b) => parseInt(a.idSalary) - parseInt(b.idSalary));
       setSalaries(salariesData)
       setEmployees(employeesData)
-      
+
       // Tự động tạo id mới khi thêm
       const maxId = Math.max(...salariesData.map(salary => parseInt(salary.idSalary, 10)), 0);
       setFormData(prev => ({
@@ -147,18 +147,18 @@ const Salary = () => {
         const currentTotalItems = filteredSalaries.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentSalaries.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Logic điều hướng trang sau khi xóa
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(1);
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchData()
         setNotification({ message: 'Xóa lương thành công', type: 'success' })
       } else {
@@ -211,13 +211,13 @@ const Salary = () => {
 
   const filteredSalaries = filterData()
   const totalPages = Math.ceil(filteredSalaries.length / ITEMS_PER_PAGE)
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentSalaries = filteredSalaries.slice(startIndex, endIndex)
@@ -332,15 +332,15 @@ const Salary = () => {
       })()}
       <div className="salary-page-header">
         <h1 className="salary-page-title">Quản lý lương nhân viên</h1>
-        <button 
-          className="salary-btn salary-btn-primary" 
+        <button
+          className="salary-btn salary-btn-primary"
           onClick={handleAdd}
         >
           Thêm bản ghi lương mới
         </button>
       </div>
 
-      <div className="salary-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -349,7 +349,7 @@ const Salary = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="salary-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -357,7 +357,7 @@ const Salary = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="salary-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="employeeName">Tên nhân viên</option>
@@ -387,7 +387,7 @@ const Salary = () => {
                 <select
                   className="salary-form-input"
                   value={formData.idEmployee}
-                  onChange={(e) => setFormData({...formData, idEmployee: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, idEmployee: e.target.value })}
                   required
                 >
                   <option value="">Chọn nhân viên</option>
@@ -404,7 +404,7 @@ const Salary = () => {
                   type="number"
                   className="salary-form-input"
                   value={formData.basicSalary}
-                  onChange={(e) => setFormData({...formData, basicSalary: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, basicSalary: e.target.value })}
                   required
                   min="0"
                 />
@@ -415,7 +415,7 @@ const Salary = () => {
                   type="number"
                   className="salary-form-input"
                   value={formData.bonus}
-                  onChange={(e) => setFormData({...formData, bonus: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, bonus: e.target.value })}
                   required
                   min="0"
                 />
@@ -426,7 +426,7 @@ const Salary = () => {
                   type="number"
                   className="salary-form-input"
                   value={formData.deduction}
-                  onChange={(e) => setFormData({...formData, deduction: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, deduction: e.target.value })}
                   required
                   min="0"
                 />
@@ -447,14 +447,14 @@ const Salary = () => {
                   type="month"
                   className="salary-form-input"
                   value={formData.salaryMonth}
-                  onChange={(e) => setFormData({...formData, salaryMonth: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, salaryMonth: e.target.value })}
                   required
                 />
               </div>
               <div className="salary-form-actions">
                 <button type="submit" className="salary-btn salary-btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="salary-btn salary-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
@@ -500,21 +500,21 @@ const Salary = () => {
                     <td>{salary.totalSalary?.toLocaleString()} VNĐ</td>
                     <td>{formatMonthYear(salary.salaryMonth)}</td>
                     <td>
-                      <button 
+                      <button
                         className="salary-btn salary-btn-info salary-btn-sm salary-action-anim"
                         style={{ minWidth: 60, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
                         onClick={() => handleShowDetails(salary)}
                       >
                         Chi tiết
                       </button>
-                      <button 
+                      <button
                         className="salary-btn salary-btn-primary salary-btn-sm salary-action-anim"
                         style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: 8 }}
                         onClick={() => handleEdit(salary)}
                       >
                         Sửa
                       </button>
-                      <button 
+                      <button
                         className="salary-btn salary-btn-secondary salary-btn-sm salary-action-anim"
                         style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                         onClick={() => handleDelete(salary.idSalary)}

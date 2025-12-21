@@ -1,25 +1,30 @@
-import React, { useState, useEffect } from 'react'; // Thêm useEffect
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axios from 'axios'; 
+import axios from 'axios';
 import { useAuth } from '../../../hooks/useAuth.js';
 import useCart from '../../../hooks/useCart.js';
 import VNPayPayment from '../../../components/VNPayPayment.jsx';
 import '../css/Checkout.css';
 
 // URL Backend
-const API_BASE_URL = 'http://localhost/market_management/backend/api/vnpay'; 
+const API_BASE_URL = 'http://localhost/market_management/backend/api';
+const VNPAY_API_URL = 'http://localhost/market_management/backend/api/vnpay';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cart, clearCart } = useCart();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // --- FIX LỖI TÍNH TIỀN ---
   // Hàm tính tổng tiền an toàn, chấp nhận cả 'price' hoặc 'exportCost'
   const calculateSafeTotal = (cartItems) => {
     if (!cartItems || cartItems.length === 0) return 0;
-    
+
     return cartItems.reduce((total, item) => {
       // Ưu tiên lấy price, nếu không có thì lấy exportCost, không có nữa thì lấy importCost
       const rawPrice = item.price || item.exportCost || item.importCost || 0;
@@ -31,12 +36,86 @@ const Checkout = () => {
 
   // State lưu tổng tiền
   const [totalAmount, setTotalAmount] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
+  const [coupons, setCoupons] = useState([]);
+  const [showCouponModal, setShowCouponModal] = useState(false);
 
   // Cập nhật tổng tiền mỗi khi cart thay đổi
   useEffect(() => {
     const total = calculateSafeTotal(cart);
     setTotalAmount(total);
+    // Reset coupon if total is 0 (empty cart)
+    if (total === 0) {
+      setSelectedCoupon(null);
+      setDiscountAmount(0);
+      setFinalAmount(0);
+    } else {
+      // Recalculate if coupon exists
+      if (selectedCoupon) {
+        applyCouponLogic(selectedCoupon, total);
+      } else {
+        setFinalAmount(total);
+      }
+    }
   }, [cart]);
+
+  // Fetch coupons
+  useEffect(() => {
+    if (user) {
+      fetchUserCoupons();
+    }
+  }, [user]);
+
+  const fetchUserCoupons = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/coupon/getUserCoupons.php?idUser=${user.idUser}`);
+      if (response.data.success) {
+        setCoupons(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching coupons", error);
+    }
+  };
+
+  const applyCouponLogic = (coupon, currentTotal) => {
+    // Check min order value
+    if (Number(coupon.min_order_value) > currentTotal) {
+      toast.warn(`Đơn hàng phải từ ${formatCurrency(coupon.min_order_value)} để dùng mã này.`);
+      setSelectedCoupon(null);
+      setDiscountAmount(0);
+      setFinalAmount(currentTotal);
+      return;
+    }
+
+    let discount = 0;
+    if (coupon.discount_type === 'percent') {
+      discount = currentTotal * (Number(coupon.discount_value) / 100);
+    } else {
+      discount = Number(coupon.discount_value);
+    }
+
+    // Ensure discount doesn't exceed total
+    if (discount > currentTotal) discount = currentTotal;
+
+    setDiscountAmount(discount);
+    setFinalAmount(currentTotal - discount);
+    setSelectedCoupon(coupon);
+  };
+
+  const handleSelectCoupon = (coupon) => {
+    applyCouponLogic(coupon, totalAmount);
+    setShowCouponModal(false);
+    toast.success(`Đã áp dụng mã ${coupon.code}`);
+  };
+
+  const handleRemoveCoupon = () => {
+    setSelectedCoupon(null);
+    setDiscountAmount(0);
+    setFinalAmount(totalAmount);
+    toast.info("Đã bỏ mã giảm giá");
+  };
 
   const [checkoutData, setCheckoutData] = useState({
     name: user?.fullName || user?.nameUser || '',
@@ -44,7 +123,7 @@ const Checkout = () => {
     phone: user?.phone || '',
     payment: 'cash',
   });
-  
+
   const [checkoutError, setCheckoutError] = useState({});
   const [showVNPay, setShowVNPay] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState(null);
@@ -68,11 +147,8 @@ const Checkout = () => {
 
   const createOrderInDatabase = async () => {
     try {
-      // Tính toán lại lần cuối trước khi gửi để chắc chắn không bị 0
-      const finalTotal = calculateSafeTotal(cart);
-
-      if (finalTotal <= 0) {
-        toast.error("Tổng tiền không hợp lệ (0đ). Vui lòng kiểm tra giỏ hàng.");
+      if (finalAmount < 0) { // Should not happen but strict check
+        toast.error("Tổng tiền không hợp lệ.");
         return null;
       }
 
@@ -81,7 +157,7 @@ const Checkout = () => {
         idProduct: item.idProduct,
         quantity: item.quantity,
         // Ép kiểu dữ liệu giá về key 'price' để PHP đọc được
-        price: Number(item.price || item.exportCost || 0) 
+        price: Number(item.price || item.exportCost || 0)
       }));
 
       // Đảm bảo idUser được gửi đúng
@@ -92,18 +168,19 @@ const Checkout = () => {
 
       const payload = {
         ...checkoutData,
-        idUser: user.idUser, // Đảm bảo idUser luôn có giá trị
-        cart: standardizedCart, // Gửi mảng đã chuẩn hóa
-        totalAmount: finalTotal // Gửi số tiền đã tính toán
+        idUser: user.idUser,
+        cart: standardizedCart,
+        totalAmount: finalAmount, // Send FINAL amount after discount
+        couponCode: selectedCoupon ? selectedCoupon.code : null,
+        discountAmount: discountAmount
       };
 
       console.log("PAYLOAD GỬI ĐI:", payload);
-      console.log("User ID:", user.idUser);
 
-      const response = await axios.post(`${API_BASE_URL}/create_order.php`, payload, {
+      const response = await axios.post(`${VNPAY_API_URL}/create_order.php`, payload, {
         headers: { 'Content-Type': 'application/json' }
       });
-      
+
       if (response.data.status === 'success') {
         return response.data.idOrder;
       } else {
@@ -128,10 +205,10 @@ const Checkout = () => {
 
     // 1. Tạo đơn hàng
     const orderId = await createOrderInDatabase();
-    
+
     if (!orderId) {
       setIsProcessing(false);
-      return; 
+      return;
     }
 
     // 2. Xử lý thanh toán
@@ -168,17 +245,17 @@ const Checkout = () => {
         <form className="checkout-form" onSubmit={handleCheckoutSubmit}>
           <div className="checkout-form-group">
             <label>Họ tên</label>
-            <input name="name" value={checkoutData.name} onChange={handleCheckoutInput} placeholder="Nhập họ tên" />
+            <input className="checkout-input" name="name" value={checkoutData.name} onChange={handleCheckoutInput} placeholder="Nhập họ tên" />
             {checkoutError.name && <div className="checkout-error">{checkoutError.name}</div>}
           </div>
           <div className="checkout-form-group">
             <label>Địa chỉ</label>
-            <input name="address" value={checkoutData.address} onChange={handleCheckoutInput} placeholder="Nhập địa chỉ nhận hàng" />
+            <input className="checkout-input" name="address" value={checkoutData.address} onChange={handleCheckoutInput} placeholder="Nhập địa chỉ nhận hàng" />
             {checkoutError.address && <div className="checkout-error">{checkoutError.address}</div>}
           </div>
           <div className="checkout-form-group">
             <label>Số điện thoại</label>
-            <input name="phone" value={checkoutData.phone} onChange={handleCheckoutInput} placeholder="Nhập số điện thoại" />
+            <input className="checkout-input" name="phone" value={checkoutData.phone} onChange={handleCheckoutInput} placeholder="Nhập số điện thoại" />
             {checkoutError.phone && <div className="checkout-error">{checkoutError.phone}</div>}
           </div>
 
@@ -191,8 +268,44 @@ const Checkout = () => {
             {checkoutError.payment && <div className="checkout-error">{checkoutError.payment}</div>}
           </div>
 
+          {/* COUPON SECTION */}
+          <div className="checkout-coupon-section">
+            <div className="checkout-section-header">
+              <h3>Mã giảm giá</h3>
+              {!selectedCoupon ? (
+                <button type="button" className="btn-select-coupon" onClick={() => setShowCouponModal(true)}>
+                  Chọn mã
+                </button>
+              ) : (
+                <button type="button" className="btn-remove-coupon" onClick={handleRemoveCoupon}>
+                  Bỏ chọn
+                </button>
+              )}
+            </div>
+
+            {selectedCoupon && (
+              <div className="selected-coupon-info">
+                <span>Đang dùng: <strong>{selectedCoupon.code}</strong></span>
+                <span className="discount-value">- {formatCurrency(discountAmount)}</span>
+              </div>
+            )}
+          </div>
+
           <div className="checkout-summary">
-             <h3>Tổng tiền: {formatCurrency(totalAmount)}</h3>
+            <div className="summary-row">
+              <span>Tạm tính:</span>
+              <span>{formatCurrency(totalAmount)}</span>
+            </div>
+            {selectedCoupon && (
+              <div className="summary-row discount">
+                <span>Giảm giá:</span>
+                <span>-{formatCurrency(discountAmount)}</span>
+              </div>
+            )}
+            <div className="summary-row total">
+              <span>Tổng tiền:</span>
+              <span>{formatCurrency(finalAmount)}</span>
+            </div>
           </div>
 
           <button className="checkout-submit-btn" type="submit" disabled={isProcessing}>
@@ -200,15 +313,38 @@ const Checkout = () => {
           </button>
         </form>
       </div>
-      
+
+      {/* Coupon Modal */}
+      {showCouponModal && (
+        <div className="modal-overlay" onClick={() => setShowCouponModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h3>Chọn mã giảm giá</h3>
+            <button className="modal-close" onClick={() => setShowCouponModal(false)}>×</button>
+            <div className="coupon-list-modal">
+              {coupons.length === 0 ? (
+                <p>Bạn chưa có mã giảm giá nào phù hợp.</p>
+              ) : (
+                coupons.map(coupon => (
+                  <div key={coupon.code} className="coupon-item-modal" onClick={() => handleSelectCoupon(coupon)}>
+                    <div className="code">{coupon.code}</div>
+                    <div className="desc">{coupon.description}</div>
+                    <div className="expiry">HSD: {coupon.expiry_date}</div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showVNPay && (
         <div className="vnpay-overlay">
           <div className="vnpay-modal">
             <button className="vnpay-close-btn" onClick={() => setShowVNPay(false)}>×</button>
             <VNPayPayment
-              idOrder={createdOrderId} 
+              idOrder={createdOrderId}
               orderInfo={`Thanh toán đơn hàng #${createdOrderId}`}
-              amount={totalAmount}
+              amount={finalAmount} // Use FINAL amount
               onPaymentSuccess={handleVNPaySuccess}
               onPaymentError={handleVNPayError}
             />
@@ -218,6 +354,5 @@ const Checkout = () => {
     </div>
   );
 };
-
 
 export default Checkout;

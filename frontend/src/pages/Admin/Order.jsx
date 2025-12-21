@@ -93,18 +93,18 @@ const Orders = () => {
       const currentTotalItems = filteredOrders.length;
       const newTotalItems = currentTotalItems - 1;
       const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-      
+
       // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
       const itemsOnCurrentPage = currentOrders.length;
       const isLastItemOnPage = itemsOnCurrentPage === 1;
-      
+
       // Logic điều hướng trang sau khi xóa
       if (currentPage > newTotalPages && newTotalPages > 0) {
         setCurrentPage(1);
       } else if (isLastItemOnPage && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
-      
+
       setNotification({ type: 'success', message: 'Đã xóa đơn hàng' });
       loadOrders();
     } else {
@@ -126,13 +126,13 @@ const Orders = () => {
 
   // Pagination logic
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentOrders = filteredOrders.slice(startIndex, endIndex);
@@ -232,7 +232,7 @@ const Orders = () => {
         </div>
       </div>
 
-      <div className="orders-filter-bar">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Tìm kiếm theo mã đơn hoặc tên khách hàng..."
@@ -241,7 +241,7 @@ const Orders = () => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="orders-form-input"
+          className="admin-search-input"
         />
         <select
           value={filterStatus}
@@ -249,7 +249,7 @@ const Orders = () => {
             setFilterStatus(e.target.value);
             setCurrentPage(1);
           }}
-          className="orders-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả trạng thái</option>
           {Object.keys(statusLabel).map((key) => (

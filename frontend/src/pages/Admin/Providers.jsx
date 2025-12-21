@@ -43,7 +43,7 @@ const Providers = () => {
       const data = await fetchProvider();
       console.log("Fetched providers:", data);
       setProviders(data)
-      
+
       // Tự động tạo id mới khi thêm
       const maxId = Math.max(...data.map(provider => parseInt(provider.idProvider, 10)), 0);
       setFormData(prev => ({
@@ -143,18 +143,18 @@ const Providers = () => {
         const currentTotalItems = filteredProviders.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentProviders.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Logic điều hướng trang sau khi xóa
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(1);
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchProviders()
         setNotification({ message: 'Xóa nhà cung cấp thành công', type: 'success' })
       } else {
@@ -203,13 +203,13 @@ const Providers = () => {
 
   const filteredProviders = filterData()
   const totalPages = Math.ceil(filteredProviders.length / ITEMS_PER_PAGE)
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentProviders = filteredProviders.slice(startIndex, endIndex)
@@ -299,15 +299,15 @@ const Providers = () => {
       )}
       <div className="providers-page-header">
         <h1 className="providers-page-title">Quản lý nhà cung cấp</h1>
-        <button 
-          className="providers-btn providers-btn-primary" 
+        <button
+          className="providers-btn providers-btn-primary"
           onClick={handleAdd}
         >
           Thêm nhà cung cấp mới
         </button>
       </div>
 
-      <div className="providers-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -316,7 +316,7 @@ const Providers = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="providers-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -324,7 +324,7 @@ const Providers = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="providers-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameProvider">Tên nhà cung cấp</option>
@@ -356,7 +356,7 @@ const Providers = () => {
                   type="text"
                   className="providers-form-input"
                   value={formData.nameProvider}
-                  onChange={(e) => setFormData({...formData, nameProvider: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, nameProvider: e.target.value })}
                   required
                 />
               </div>
@@ -366,7 +366,7 @@ const Providers = () => {
                   type="text"
                   className="providers-form-input"
                   value={formData.addressProvider}
-                  onChange={(e) => setFormData({...formData, addressProvider: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, addressProvider: e.target.value })}
                   required
                 />
               </div>
@@ -376,7 +376,7 @@ const Providers = () => {
                   type="tel"
                   className="providers-form-input"
                   value={formData.phoneProvider}
-                  onChange={(e) => setFormData({...formData, phoneProvider: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, phoneProvider: e.target.value })}
                   required
                 />
               </div>
@@ -386,7 +386,7 @@ const Providers = () => {
                   type="email"
                   className="providers-form-input"
                   value={formData.emailProvider}
-                  onChange={(e) => setFormData({...formData, emailProvider: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, emailProvider: e.target.value })}
                   required
                 />
               </div>
@@ -396,7 +396,7 @@ const Providers = () => {
                   value={formData.idType || ''}
                   onChange={(e) => {
                     console.log("Selected idType:", e.target.value);
-                    setFormData({...formData, idType: e.target.value});
+                    setFormData({ ...formData, idType: e.target.value });
                   }}
                   className="providers-form-input"
                   required
@@ -414,8 +414,8 @@ const Providers = () => {
               </div>
               <div className="providers-form-actions">
                 <button type="submit" className="providers-btn providers-btn-primary">{formType === 'add' ? 'Thêm' : 'Lưu'}</button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="providers-btn providers-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
@@ -452,13 +452,13 @@ const Providers = () => {
                   <td>{provider.emailProvider}</td>
                   <td>{provider.nameType || `Chưa phân loại (idType: ${provider.idType})`}</td>
                   <td>
-                    <button 
+                    <button
                       className="providers-btn providers-btn-primary providers-btn-sm"
                       onClick={() => handleEdit(provider)}
                     >
                       Sửa
                     </button>
-                    <button 
+                    <button
                       className="providers-btn providers-btn-secondary providers-btn-sm"
                       onClick={() => handleDelete(provider.idProvider)}
                     >

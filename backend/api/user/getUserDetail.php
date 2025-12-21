@@ -32,7 +32,7 @@ try {
         throw new Exception('User not found');
     }
 
-    // Get user detailed info
+    // Get user detailed info from inforuser (old table)
     $detail_query = "SELECT * FROM inforuser WHERE idUser = ?";
     $detail_stmt = $db->prepare($detail_query);
     $detail_stmt->bind_param("i", $idUser);
@@ -40,11 +40,45 @@ try {
     $detail_result = $detail_stmt->get_result();
     $userInfo = $detail_result->fetch_assoc();
 
+    // If not found in inforuser, check customer table (new table)
+    if (!$userInfo) {
+        $customer_query = "SELECT fullName, phoneNumber as phone, address, email FROM customer WHERE idUser = ?";
+        $customer_stmt = $db->prepare($customer_query);
+        $customer_stmt->bind_param("i", $idUser);
+        $customer_stmt->execute();
+        $customer_result = $customer_stmt->get_result();
+        $userInfo = $customer_result->fetch_assoc();
+    }
+
+    // Backend returns 'userInfo' but frontend expects the merged object or handles it.
+    // Looking at Users.jsx: setSelectedUser(prevUser => ({ ...prevUser, ...details }));
+    // And userService.js: if (data.success) return data.data;
+    // But this API returns 'user' and 'userInfo'.
+    // Wait, userService.js line 62 says: return data.data; 
+    // BUT this API returns { 'success': true, 'message': ..., 'user': ..., 'userInfo': ... }
+    // It does NOT return a 'data' field. This is a BUG in the API/Frontend contract.
+    // UserService expects `data.data` but API returns root fields.
+    
+    // I will fix the API to return 'data' which contains the merged info or just userInfo, 
+    // OR I will fix userService. 
+    // Let's look at Users.jsx again. It expects `details` to have `fullName`, `age`, `address`, `phone`.
+    
+    // Let's restructure the response to match what userService probably expects, OR fix userService.
+    // Actually, checking userService.js again:
+    // export async function fetchUserDetails(idUser) {
+    //     const response = await fetch(`${API_URL_DETAIL}?idUser=${idUser}`);
+    //     const data = await response.json();
+    //     if (data.success) {
+    //         return data.data; 
+    //     }
+    // ...
+    
+    // So the API MUST return `data` field. 
+    
     $response = [
         'success' => true,
         'message' => 'User info retrieved successfully',
-        'user' => $user,
-        'userInfo' => $userInfo
+        'data' => $userInfo ? $userInfo : [] // Return just the details object
     ];
 
     echo json_encode($response);

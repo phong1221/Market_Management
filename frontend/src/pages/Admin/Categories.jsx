@@ -90,16 +90,16 @@ const Categories = () => {
         const currentTotalItems = filteredData.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         const itemsOnCurrentPage = currentData.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(1);
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchData()
         setNotification({ message: 'Xóa danh mục thành công', type: 'success' })
       } else {
@@ -142,13 +142,13 @@ const Categories = () => {
 
   const filteredData = filterData()
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE)
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const currentData = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
@@ -213,7 +213,7 @@ const Categories = () => {
       </div>
     )
   }
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -247,18 +247,18 @@ const Categories = () => {
         </button>
       </div>
 
-      <div className="typeProduct-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
           value={searchTerm}
           onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-          className="typeProduct-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
           onChange={(e) => { setSearchCriteria(e.target.value); setCurrentPage(1); }}
-          className="typeProduct-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameType">Tên danh mục</option>

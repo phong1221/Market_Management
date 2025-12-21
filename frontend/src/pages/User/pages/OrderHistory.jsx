@@ -35,6 +35,7 @@ const OrderHistory = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (user && user.idUser) {
       loadOrders();
     } else {

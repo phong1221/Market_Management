@@ -18,6 +18,7 @@ const AccountInfo = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     // Kiểm tra xem user có đăng nhập không
     if (!user) {
       toast.error('Vui lòng đăng nhập để xem thông tin cá nhân');

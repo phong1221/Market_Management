@@ -46,7 +46,7 @@ const Users = () => {
     try {
       const data = await fetchUser();
       setUsers(data)
-      
+
       // Tự động tạo id mới khi thêm
       const maxId = Math.max(...data.map(user => parseInt(user.idUser, 10)), 0);
       setFormData(prev => ({
@@ -117,18 +117,18 @@ const Users = () => {
         const currentTotalItems = filteredUsers.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentUsers.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Logic điều hướng trang sau khi xóa
         if (currentPage > newTotalPages && newTotalPages > 0) {
           setCurrentPage(1);
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchUsers()
         setNotification({ message: 'Xóa người dùng thành công', type: 'success' })
       } else {
@@ -196,13 +196,13 @@ const Users = () => {
 
   const filteredUsers = filterData()
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE)
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE
   const endIndex = startIndex + ITEMS_PER_PAGE
   const currentUsers = filteredUsers.slice(startIndex, endIndex)
@@ -292,8 +292,8 @@ const Users = () => {
       )}
       <div className="users-page-header">
         <h1 className="users-page-title">Quản lý người dùng</h1>
-        <button 
-          className="users-btn users-btn-primary" 
+        <button
+          className="users-btn users-btn-primary"
           onClick={() => setShowForm(true)}
         >
           Thêm người dùng mới
@@ -321,28 +321,28 @@ const Users = () => {
                   type="text"
                   className="users-form-input"
                   value={formData.nameUser}
-                  onChange={(e) => setFormData({...formData, nameUser: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, nameUser: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="users-form-group">
                 <label className="users-form-label">Mật khẩu:</label>
                 <input
                   type="password"
                   className="users-form-input"
                   value={formData.passWord}
-                  onChange={(e) => setFormData({...formData, passWord: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, passWord: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="users-form-group">
                 <label className="users-form-label">Vai trò:</label>
                 <select
                   className="users-form-input"
                   value={formData.roleUser}
-                  onChange={(e) => setFormData({...formData, roleUser: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, roleUser: e.target.value })}
                 >
                   <option value="Admin">Admin</option>
                   <option value="Cashier">Cashier</option>
@@ -352,11 +352,11 @@ const Users = () => {
                   <option value="Accountant">Accountant</option>
                 </select>
               </div>
-              
+
               <div className="users-form-actions">
                 <button type="submit" className="users-btn users-btn-primary">Lưu</button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="users-btn users-btn-secondary"
                   onClick={() => setShowForm(false)}
                 >
@@ -388,7 +388,7 @@ const Users = () => {
                   type="text"
                   className="users-form-input"
                   value={editData.nameUser}
-                  onChange={(e) => setEditData({...editData, nameUser: e.target.value})}
+                  onChange={(e) => setEditData({ ...editData, nameUser: e.target.value })}
                   required
                 />
               </div>
@@ -398,7 +398,7 @@ const Users = () => {
                   type="text"
                   className="users-form-input"
                   value={editData.passWord}
-                  onChange={(e) => setEditData({...editData, passWord: e.target.value})}
+                  onChange={(e) => setEditData({ ...editData, passWord: e.target.value })}
                   required
                 />
               </div>
@@ -407,7 +407,7 @@ const Users = () => {
                 <select
                   className="users-form-input"
                   value={editData.roleUser}
-                  onChange={(e) => setEditData({...editData, roleUser: e.target.value})}
+                  onChange={(e) => setEditData({ ...editData, roleUser: e.target.value })}
                 >
                   <option value="Admin">Admin</option>
                   <option value="Cashier">Cashier</option>
@@ -419,8 +419,8 @@ const Users = () => {
               </div>
               <div className="users-form-actions">
                 <button type="submit" className="users-btn users-btn-primary">Cập nhật</button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="users-btn users-btn-secondary"
                   onClick={() => setShowEdit(false)}
                 >
@@ -479,8 +479,8 @@ const Users = () => {
               )}
             </div>
             <div className="users-form-actions">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="users-btn users-btn-secondary"
                 onClick={() => setShowDetail(false)}
               >
@@ -491,7 +491,7 @@ const Users = () => {
         </div>
       )}
 
-      <div className="search-container" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -500,8 +500,7 @@ const Users = () => {
             setSearchTerm(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ flex: 1 }}
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -509,8 +508,7 @@ const Users = () => {
             setSearchCriteria(e.target.value)
             setCurrentPage(1)
           }}
-          className="modal-input"
-          style={{ width: 'auto' }}
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameUser">Tên đăng nhập</option>
@@ -537,21 +535,21 @@ const Users = () => {
                 <td>••••••••</td>
                 <td>{user.roleUser}</td>
                 <td>
-                  <button 
+                  <button
                     className="users-btn users-btn-info users-btn-sm action-anim"
                     style={{ minWidth: 60, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleViewDetail(user)}
                   >
                     Chi tiết
                   </button>
-                  <button 
+                  <button
                     className="users-btn users-btn-primary users-btn-sm action-anim"
                     style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem', marginRight: '5px' }}
                     onClick={() => handleEditClick(user)}
                   >
                     Sửa
                   </button>
-                  <button 
+                  <button
                     className="users-btn users-btn-secondary users-btn-sm action-anim"
                     style={{ minWidth: 48, padding: '4px 10px', fontSize: '0.95rem' }}
                     onClick={() => handleDelete(user.idUser)}

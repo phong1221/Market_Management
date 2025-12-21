@@ -25,7 +25,7 @@ const Employees = () => {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [employeesWithSalary, setEmployeesWithSalary] = useState([]);
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchEmployees()
     fetchEmployeesWithSalary()
   }, [])
@@ -138,11 +138,11 @@ const Employees = () => {
         const currentTotalItems = filteredEmployees.length;
         const newTotalItems = currentTotalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / ITEMS_PER_PAGE);
-        
+
         // Kiểm tra xem phần tử bị xóa có phải là phần tử cuối cùng của trang hiện tại không
         const itemsOnCurrentPage = currentEmployees.length;
         const isLastItemOnPage = itemsOnCurrentPage === 1;
-        
+
         // Nếu trang hiện tại lớn hơn số trang mới và có ít nhất 1 trang, chuyển về trang đầu tiên
         // Hoặc nếu xóa phần tử cuối cùng của trang và không phải trang đầu tiên, chuyển về trang trước
         if (currentPage > newTotalPages && newTotalPages > 0) {
@@ -150,7 +150,7 @@ const Employees = () => {
         } else if (isLastItemOnPage && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         }
-        
+
         fetchEmployees();
         fetchEmployeesWithSalary(); // Cập nhật danh sách nhân viên có lương
         setNotification({ message: result.message, type: "success" });
@@ -194,13 +194,13 @@ const Employees = () => {
 
   const filteredEmployees = filterData();
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
-  
+
   // Đảm bảo currentPage không vượt quá totalPages
   const validCurrentPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
   if (validCurrentPage !== currentPage) {
     setCurrentPage(validCurrentPage);
   }
-  
+
   const startIndex = (validCurrentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
@@ -295,15 +295,15 @@ const Employees = () => {
       )}
       <div className="employees-page-header">
         <h1 className="employees-page-title">Quản lý nhân viên</h1>
-        <button 
-          className="employees-btn employees-btn-primary" 
+        <button
+          className="employees-btn employees-btn-primary"
           onClick={handleAdd}
         >
           Thêm nhân viên mới
         </button>
       </div>
 
-      <div className="employees-search-container">
+      <div className="admin-search-container">
         <input
           type="text"
           placeholder="Nhập từ khóa tìm kiếm..."
@@ -312,7 +312,7 @@ const Employees = () => {
             setSearchTerm(e.target.value);
             setCurrentPage(1);
           }}
-          className="employees-form-input"
+          className="admin-search-input"
         />
         <select
           value={searchCriteria}
@@ -320,7 +320,7 @@ const Employees = () => {
             setSearchCriteria(e.target.value);
             setCurrentPage(1);
           }}
-          className="employees-form-input"
+          className="admin-search-select"
         >
           <option value="all">Tất cả</option>
           <option value="nameEmployee">Tên nhân viên</option>
@@ -354,48 +354,48 @@ const Employees = () => {
                   required
                 />
               </div>
-              
+
               <div className="employees-form-group">
                 <label className="employees-form-label">Giới tính:</label>
                 <select
                   className="employees-form-input"
                   value={editingEmployee.genderEmployee}
-                  onChange={(e) => setEditingEmployee({...editingEmployee, genderEmployee: e.target.value})}
+                  onChange={(e) => setEditingEmployee({ ...editingEmployee, genderEmployee: e.target.value })}
                 >
                   <option value="Male">Nam</option>
                   <option value="Female">Nữ</option>
                   <option value="Other">Khác</option>
                 </select>
               </div>
-              
+
               <div className="employees-form-group">
                 <label className="employees-form-label">Địa chỉ:</label>
                 <input
                   type="text"
                   className="employees-form-input"
                   value={editingEmployee.addressEmployee}
-                  onChange={(e) => setEditingEmployee({...editingEmployee, addressEmployee: e.target.value})}
+                  onChange={(e) => setEditingEmployee({ ...editingEmployee, addressEmployee: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="employees-form-group">
                 <label className="employees-form-label">Số điện thoại:</label>
                 <input
                   type="tel"
                   className="employees-form-input"
                   value={editingEmployee.phoneEmployee}
-                  onChange={(e) => setEditingEmployee({...editingEmployee, phoneEmployee: e.target.value})}
+                  onChange={(e) => setEditingEmployee({ ...editingEmployee, phoneEmployee: e.target.value })}
                   required
                 />
               </div>
-              
+
               <div className="employees-form-group">
                 <label className="employees-form-label">Chức vụ:</label>
                 <select
                   className="employees-form-input"
                   value={editingEmployee.roleEmployee}
-                  onChange={(e) => setEditingEmployee({...editingEmployee, roleEmployee: e.target.value})}
+                  onChange={(e) => setEditingEmployee({ ...editingEmployee, roleEmployee: e.target.value })}
                 >
                   <option value="Cashier">Thu ngân</option>
                   <option value="Manager">Quản lý</option>
@@ -403,7 +403,7 @@ const Employees = () => {
                   <option value="Stocker">Thủ kho</option>
                 </select>
               </div>
-              
+
               <div className="employees-form-actions">
                 <button type="submit" className="employees-btn employees-btn-primary">{modalType === "add" ? "Thêm" : "Lưu"}</button>
                 <button type="button" className="employees-btn employees-btn-secondary" onClick={() => setShowModal(false)}>Hủy</button>
@@ -436,7 +436,7 @@ const Employees = () => {
                 <td>{employee.phoneEmployee}</td>
                 <td>{employee.roleEmployee}</td>
                 <td>
-                  <button 
+                  <button
                     className={`employees-btn employees-btn-sm ${employeesWithSalary.includes(employee.idEmployee) ? 'employees-btn-warning' : 'employees-btn-secondary'}`}
                     onClick={() => handleDelete(employee.idEmployee)}
                     title={employeesWithSalary.includes(employee.idEmployee) ? 'Nhân viên này có dữ liệu lương, không thể xóa' : 'Xóa nhân viên'}
